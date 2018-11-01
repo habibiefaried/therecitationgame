@@ -3,10 +3,16 @@ import os
 import zipfile
 from glob import glob
 
-surah = 1 #alfatihah
+#alfatihah
+surah = 1 
+total_ayah = 7
+
 os.system("rm -rf ../audio/*") #clearing folder audio first
+os.system("rm -rf ../dataset/*") #clearing folder audio first
 os.system("mkdir -p ../audio/training_set")
 os.system("mkdir -p ../audio/test_set")
+os.system("mkdir -p ../dataset/training_set")
+os.system("mkdir -p ../dataset/test_set")
 
 def download(urls, isTrainingSet):
 	i = 1
@@ -33,8 +39,41 @@ def download(urls, isTrainingSet):
 
 		i = i + 1
 
+def create_mfcc(urls, isTrainingSet):
+	#now only creating train data
+	from python_speech_features import mfcc
+	import scipy.io.wavfile as wav
+	import matplotlib.pyplot as plt
+	from PIL import Image
+
+	t = ""
+	if (isTrainingSet):
+		t = "training_set"
+	else:
+		t = "test_set"
+
+	for reciter in range(1,len(urls)+1):
+		for ayah in range(1,total_ayah+1):
+			folder_target = "../dataset/"+t+"/"+str(ayah)+"/"
+			os.system("mkdir -p "+folder_target)
+			print "Progress: "+str(reciter)+"-"+"{0:0=3d}".format(ayah)
+			(rate,sig) = wav.read("../audio/"+t+"/"+str(reciter)+"/"+"{0:0=3d}".format(surah)+"{0:0=3d}".format(ayah)+".mp3.wav")
+			mfcc_feat = mfcc(sig,rate,nfft=1024)
+
+			fig = plt.figure()
+			plt.plot(mfcc_feat)
+
+			imagename = folder_target+str(ayah)+"."+str(reciter)
+
+			fig.savefig(imagename+".png", dpi=fig.dpi,bbox_inches='tight')
+			im = Image.open(imagename+".png")
+			im = im.convert("RGB")
+			im = im.save(imagename+".jpg",'JPEG')
+			os.remove(imagename+".png")
+			plt.close()
+
 url_trains =	[
-			"http://www.everyayah.com/data/Abdul_Basit_Mujawwad_128kbps/zips/",
+		"http://www.everyayah.com/data/Abdul_Basit_Mujawwad_128kbps/zips/",
 		#"http://www.everyayah.com/data/Abdullaah_3awwaad_Al-Juhaynee_128kbps/zips/",
 		#"http://www.everyayah.com/data/Abdullah_Basfar_192kbps/zips/",
 		#"http://www.everyayah.com/data/Abdullah_Matroud_128kbps/zips/",
@@ -88,3 +127,4 @@ for r in result:
 	print "Processing: ffmpeg -i "+r+" -acodec pcm_u8 -ar 22050 "+r+".wav > /dev/null 2>&1"
 	os.system("ffmpeg -i "+r+" -acodec pcm_u8 -ar 22050 "+r+".wav > /dev/null 2>&1")
 
+create_mfcc(url_trains, True)
