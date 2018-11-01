@@ -40,7 +40,6 @@ def download(urls, isTrainingSet):
 		i = i + 1
 
 def create_mfcc(urls, isTrainingSet):
-	#now only creating train data
 	from python_speech_features import mfcc
 	import scipy.io.wavfile as wav
 	import matplotlib.pyplot as plt
@@ -56,7 +55,8 @@ def create_mfcc(urls, isTrainingSet):
 		for ayah in range(1,total_ayah+1):
 			folder_target = "../dataset/"+t+"/"+str(ayah)+"/"
 			os.system("mkdir -p "+folder_target)
-			print "Progress: "+str(reciter)+"-"+"{0:0=3d}".format(ayah)
+			print "[+] "+t+" progress: "+str(reciter)+"-"+"{0:0=3d}".format(ayah)
+			
 			(rate,sig) = wav.read("../audio/"+t+"/"+str(reciter)+"/"+"{0:0=3d}".format(surah)+"{0:0=3d}".format(ayah)+".mp3.wav")
 			mfcc_feat = mfcc(sig,rate,nfft=1024)
 
@@ -92,7 +92,6 @@ url_trains =	[
 		"http://www.everyayah.com/data/Husary_128kbps/zips/",
 		"http://www.everyayah.com/data/Husary_Muallim_128kbps/zips/",
 		"http://www.everyayah.com/data/Husary_Mujawwad_64kbps/zips/",
-		"http://www.everyayah.com/data/Ibrahim_Akhdar_32kbps/zips/",
 		"http://www.everyayah.com/data/Karim_Mansoori_40kbps/zips/",
 		"http://www.everyayah.com/data/Khaalid_Abdullaah_al-Qahtaanee_192kbps/zips/",
 		"http://www.everyayah.com/data/MaherAlMuaiqly128kbps/zips/",
@@ -114,10 +113,8 @@ url_trains =	[
 		"http://www.everyayah.com/data/khalefa_al_tunaiji_64kbps/zips/",
 			]
 
-url_tests = 
-	[
+url_tests = [
 		"http://www.everyayah.com/data/Abdul_Basit_Murattal_64kbps/zips/",
-		"http://www.everyayah.com/data/Abdullah_Basfar_32kbps/zips/",
 		"http://www.everyayah.com/data/Abdullah_Basfar_64kbps/zips/",
 		"http://www.everyayah.com/data/Abdurrahmaan_As-Sudais_64kbps/zips/",
 		"http://www.everyayah.com/data/Abu_Bakr_Ash-Shaatree_64kbps/zips/",
