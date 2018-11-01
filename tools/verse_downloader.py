@@ -1,7 +1,6 @@
 import urllib
 import os
 import zipfile
-import os
 from glob import glob
 
 surah = 1 #alfatihah
