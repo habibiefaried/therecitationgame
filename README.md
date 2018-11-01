@@ -6,5 +6,11 @@ Available on telegram with username @the_recitation_bot
 Link: https://telegram.me/@the_recitation_bot
 
 # Technology Spec
-* A
-* B
+* Database: Mongo
+* Algorithm: Convolutional Neural Network - Deep Learning
+* Containerization: Docker CE
+* Orchestration: Docker Swarm
+
+# References
+*
+*
