@@ -6,3 +6,4 @@ matplotlib
 tensorflow
 keras
 pprint
+python-telegram-bot
