@@ -107,14 +107,29 @@ url_trains =	[
 		"http://www.everyayah.com/data/Salah_Al_Budair_128kbps/zips/",
 		"http://www.everyayah.com/data/Yaser_Salamah_128kbps/zips/",
 		"http://www.everyayah.com/data/aziz_alili_128kbps/zips/",
+		"http://www.everyayah.com/data/Hudhaify_32kbps/zips/",
 		"http://www.everyayah.com/data/ahmed_ibn_ali_al_ajamy_128kbps/zips/",
 		"http://www.everyayah.com/data/Yasser_Ad-Dussary_128kbps/zips/",
 		"http://www.everyayah.com/data/mahmoud_ali_al_banna_32kbps/zips/",
 		"http://www.everyayah.com/data/khalefa_al_tunaiji_64kbps/zips/",
 			]
 
-url_tests = [
-
+url_tests = 
+	[
+		"http://www.everyayah.com/data/Abdul_Basit_Murattal_64kbps/zips/",
+		"http://www.everyayah.com/data/Abdullah_Basfar_32kbps/zips/",
+		"http://www.everyayah.com/data/Abdullah_Basfar_64kbps/zips/",
+		"http://www.everyayah.com/data/Abdurrahmaan_As-Sudais_64kbps/zips/",
+		"http://www.everyayah.com/data/Abu_Bakr_Ash-Shaatree_64kbps/zips/",
+		"http://www.everyayah.com/data/Ahmed_ibn_Ali_al-Ajamy_64kbps_QuranExplorer.Com/zips/",
+		"http://www.everyayah.com/data/Alafasy_64kbps/zips/",
+		"http://www.everyayah.com/data/Hani_Rifai_64kbps/zips/",
+		"http://www.everyayah.com/data/Hudhaify_64kbps/zips/",
+		"http://www.everyayah.com/data/Husary_64kbps/zips/",
+		"http://www.everyayah.com/data/Maher_AlMuaiqly_64kbps/zips/",
+		"http://www.everyayah.com/data/Mohammad_al_Tablaway_64kbps/zips/",
+		"http://www.everyayah.com/data/Muhammad_Jibreel_64kbps/zips/",
+		"http://www.everyayah.com/data/Saood_ash-Shuraym_64kbps/zips/",
 	]
 
 download(url_trains, True)
