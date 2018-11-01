@@ -3,3 +3,6 @@ python_speech_features
 scipy
 requests
 matplotlib
+tensorflow
+keras
+pprint
