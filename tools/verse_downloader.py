@@ -128,3 +128,4 @@ for r in result:
 	os.system("ffmpeg -i "+r+" -acodec pcm_u8 -ar 22050 "+r+".wav > /dev/null 2>&1")
 
 create_mfcc(url_trains, True)
+create_mfcc(url_trains, False)
