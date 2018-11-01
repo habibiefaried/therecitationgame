@@ -25,7 +25,7 @@ def download(urls, isTrainingSet):
 		else:
 			folder_t = "../audio/test_set/"+str(i)
 		
-		os.system("mkdir "+folder_t)
+		os.system("mkdir -p "+folder_t)
 		file_name = folder_t+"/"+rename_surah+".zip"
 
 		print "Downloading: "+url+rename_surah+".zip"
@@ -74,7 +74,7 @@ def create_mfcc(urls, isTrainingSet):
 
 url_trains =	[
 		"http://www.everyayah.com/data/Abdul_Basit_Mujawwad_128kbps/zips/",
-		#"http://www.everyayah.com/data/Abdullaah_3awwaad_Al-Juhaynee_128kbps/zips/",
+		"http://www.everyayah.com/data/Abdullaah_3awwaad_Al-Juhaynee_128kbps/zips/",
 		#"http://www.everyayah.com/data/Abdullah_Basfar_192kbps/zips/",
 		#"http://www.everyayah.com/data/Abdullah_Matroud_128kbps/zips/",
 		#"http://www.everyayah.com/data/Abdurrahmaan_As-Sudais_192kbps/zips/",
@@ -128,4 +128,4 @@ for r in result:
 	os.system("ffmpeg -i "+r+" -acodec pcm_u8 -ar 22050 "+r+".wav > /dev/null 2>&1")
 
 create_mfcc(url_trains, True)
-create_mfcc(url_trains, False)
+create_mfcc(url_tests, False)
