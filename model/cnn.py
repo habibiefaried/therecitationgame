@@ -19,8 +19,11 @@ from keras.layers import Flatten
 from keras.layers import Dense
 from pprint import pprint
 
-size_l = 558
-size_h = 416
+#size_l = 558
+#size_h = 416
+
+size_l = 256
+size_l = 256
 
 # Initialising the CNN
 classifier = Sequential()
