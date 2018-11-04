@@ -15,6 +15,14 @@ Link: https://telegram.me/the_recitation_bot
 # DB Design
 It's json structured contains 2 schema
 
+# Requirements
+* pip install -r requirements (delete tensorflow part if you use tensorflow-gpu)
+* apt-get install python-tk 
+* Install ffmpeg
+
+# Notes
+If you are using this on linux server, then at verse_downloader.py file you have to uncomment agg backend
+
 ### user
 * telegram_id
 * username
