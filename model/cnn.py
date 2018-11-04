@@ -61,12 +61,12 @@ test_datagen = ImageDataGenerator(rescale = 1./255)
 
 training_set = train_datagen.flow_from_directory('../dataset/training_set',
                                                  target_size = (size_l, size_h),
-                                                 batch_size = 7,
+                                                 batch_size = 16,
                                                  class_mode = 'categorical')
 
 test_set = test_datagen.flow_from_directory('../dataset/test_set',
                                             target_size = (size_l, size_h),
-                                            batch_size = 7,
+                                            batch_size = 16,
                                             class_mode = 'categorical')
 
 classifier.fit_generator(training_set,
