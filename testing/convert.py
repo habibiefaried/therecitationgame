@@ -20,10 +20,10 @@ FILENAME = "test.wav"
 # ffmpeg -i test.ogg -ar 22050 FILENAME
 
 # using python_speech lib
-#(rate,sig) = wav.read(FILENAME)
-#mfcc_feat = mfcc(sig,rate,nfft=1024)
-#fig = plt.figure()
-#plt.plot(mfcc_feat)
+(rate,sig) = wav.read(FILENAME)
+mfcc_feat = mfcc(sig,rate,nfft=1024)
+fig = plt.figure()
+plt.plot(mfcc_feat)
 
 #using librosa lib
 #hop_length = 512
@@ -37,10 +37,10 @@ FILENAME = "test.wav"
 #beat_chroma = librosa.util.sync(chromagram,beat_frames,aggregate=np.median)
 #music_graph = np.vstack([beat_chroma, beat_mfcc_delta])
 
-(rate,sig) = wav.read(FILENAME)
-fbank_feat = logfbank(sig,rate,nfft=1024)
-fig = plt.figure()
-plt.plot(fbank_feat)
+#(rate,sig) = wav.read(FILENAME)
+#fbank_feat = logfbank(sig,rate,nfft=1024)
+#fig = plt.figure()
+#plt.plot(fbank_feat)
 
 imagename = FILENAME
 

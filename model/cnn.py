@@ -46,7 +46,7 @@ classifier.add(Dense(units = 128, activation = 'relu'))
 classifier.add(Dense(units = 1, activation = 'sigmoid'))
 
 # Compiling the CNN
-classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
+classifier.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = ['accuracy'])
 
 # Part 2 - Fitting the CNN to the images
 
@@ -61,13 +61,13 @@ test_datagen = ImageDataGenerator(rescale = 1./255)
 
 training_set = train_datagen.flow_from_directory('../dataset/training_set',
                                                  target_size = (size_l, size_h),
-                                                 batch_size = 32,
-                                                 class_mode = 'binary')
+                                                 batch_size = 7,
+                                                 class_mode = 'categorical')
 
 test_set = test_datagen.flow_from_directory('../dataset/test_set',
                                             target_size = (size_l, size_h),
-                                            batch_size = 32,
-                                            class_mode = 'binary')
+                                            batch_size = 7,
+                                            class_mode = 'categorical')
 
 classifier.fit_generator(training_set,
                          steps_per_epoch = 8000,
@@ -78,7 +78,7 @@ classifier.fit_generator(training_set,
 # Part 3 - Making new predictions
 import numpy as np
 from keras.preprocessing import image
-test_image = image.load_img('../testing/test.jpg', target_size = (size_l, size_h))
+test_image = image.load_img('../testing/test.wav.jpg', target_size = (size_l, size_h))
 test_image = image.img_to_array(test_image)
 test_image = np.expand_dims(test_image, axis = 0)
 result = classifier.predict(test_image)
