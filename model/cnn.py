@@ -18,12 +18,28 @@ from keras.layers import MaxPooling2D
 from keras.layers import Flatten
 from keras.layers import Dense
 from pprint import pprint
+import tensorflow as tf
 
 #size_l = 558
 #size_h = 416
 
 size_l = 256
 size_h = 256
+
+#Copying tensorflow
+def as_keras_metric(method):
+    import functools
+    from keras import backend as K
+    import tensorflow as tf
+    @functools.wraps(method)
+    def wrapper(self, args, **kwargs):
+        """ Wrapper for turning tensorflow metrics into keras metrics """
+        value, update_op = method(self, args, **kwargs)
+        K.get_session().run(tf.local_variables_initializer())
+        with tf.control_dependencies([update_op]):
+            value = tf.identity(value)
+        return value
+    return wrapper
 
 # Initialising the CNN
 classifier = Sequential()
@@ -46,7 +62,7 @@ classifier.add(Dense(units = 128, activation = 'relu'))
 classifier.add(Dense(units = 7, activation = 'sigmoid'))
 
 # Compiling the CNN
-classifier.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = ['accuracy'])
+classifier.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = [as_keras_metric(tf.metrics.precision)])
 
 # Part 2 - Fitting the CNN to the images
 
