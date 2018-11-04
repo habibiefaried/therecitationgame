@@ -23,7 +23,7 @@ from pprint import pprint
 #size_h = 416
 
 size_l = 256
-size_l = 256
+size_h = 256
 
 # Initialising the CNN
 classifier = Sequential()
