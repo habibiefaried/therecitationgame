@@ -3,8 +3,8 @@ import os
 import zipfile
 from glob import glob
 
-#import matplotlib
-#matplotlib.use('Agg')
+import matplotlib
+matplotlib.use('Agg')
 
 #alfatihah
 surah = 1 

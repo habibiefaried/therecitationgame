@@ -2,6 +2,8 @@ import urllib
 import os
 import zipfile
 from glob import glob
+import matplotlib
+matplotlib.use('Agg')
 
 from python_speech_features import mfcc
 import scipy.io.wavfile as wav
