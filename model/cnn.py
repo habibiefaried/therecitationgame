@@ -92,11 +92,12 @@ classifier.fit_generator(training_set,
                          validation_steps = 2000)
 
 # Part 3 - Making new predictions
-import numpy as np
-from keras.preprocessing import image
-test_image = image.load_img('../testing/test.wav.jpg', target_size = (size_l, size_h))
-test_image = image.img_to_array(test_image)
-test_image = np.expand_dims(test_image, axis = 0)
-result = classifier.predict(test_image)
-training_set.class_indices
-pprint(result)
+# dont make prediction first
+#import numpy as np
+#from keras.preprocessing import image
+#test_image = image.load_img('../testing/test.wav.jpg', target_size = (size_l, size_h))
+#test_image = image.img_to_array(test_image)
+#test_image = np.expand_dims(test_image, axis = 0)
+#result = classifier.predict(test_image)
+#training_set.class_indices
+#pprint(result)

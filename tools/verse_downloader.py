@@ -61,17 +61,17 @@ def create_mfcc(urls, isTrainingSet):
 			os.system("mkdir -p "+folder_target)
 			print "[+] "+t+" progress: "+str(reciter)+"-"+"{0:0=3d}".format(ayah)
 			
-			(rate,sig) = wav.read("../audio/"+t+"/"+str(reciter)+"/"+"{0:0=3d}".format(surah)+"{0:0=3d}".format(ayah)+".mp3.wav")
-			mfcc_feat = mfcc(sig,rate,nfft=1024)
-			fig = plt.figure()
-			plt.plot(mfcc_feat)
-
-			#Change library, using librosa tonnetz
-			#y, sr = librosa.load("../audio/"+t+"/"+str(reciter)+"/"+"{0:0=3d}".format(surah)+"{0:0=3d}".format(ayah)+".mp3.wav")
-			#y = librosa.effects.harmonic(y)
-			#tonnetz = librosa.feature.tonnetz(y=y, sr=sr)
+			#(rate,sig) = wav.read("../audio/"+t+"/"+str(reciter)+"/"+"{0:0=3d}".format(surah)+"{0:0=3d}".format(ayah)+".mp3.wav")
+			#mfcc_feat = mfcc(sig,rate,nfft=1024)
 			#fig = plt.figure()
-			#plt.plot(tonnetz)
+			#plt.plot(mfcc_feat)
+
+			Change library, using librosa tonnetz
+			y, sr = librosa.load("../audio/"+t+"/"+str(reciter)+"/"+"{0:0=3d}".format(surah)+"{0:0=3d}".format(ayah)+".mp3.wav")
+			y = librosa.effects.harmonic(y)
+			tonnetz = librosa.feature.tonnetz(y=y, sr=sr)
+			fig = plt.figure()
+			plt.plot(tonnetz)
 
 			imagename = folder_target+str(ayah)+"."+str(reciter)
 
