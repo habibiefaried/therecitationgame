@@ -66,7 +66,7 @@ def create_mfcc(urls, isTrainingSet):
 			#fig = plt.figure()
 			#plt.plot(mfcc_feat)
 
-			Change library, using librosa tonnetz
+			#Change library, using librosa tonnetz
 			y, sr = librosa.load("../audio/"+t+"/"+str(reciter)+"/"+"{0:0=3d}".format(surah)+"{0:0=3d}".format(ayah)+".mp3.wav")
 			y = librosa.effects.harmonic(y)
 			tonnetz = librosa.feature.tonnetz(y=y, sr=sr)
