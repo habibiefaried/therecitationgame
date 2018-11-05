@@ -1,4 +1,3 @@
-import numpy as np
 from sklearn.model_selection import train_test_split
 from keras.utils import to_categorical
 import numpy as np
@@ -12,8 +11,18 @@ from keras.utils import to_categorical
 import functools
 from keras import backend as K
 import tensorflow as tf
+import librosa
 
 channel = 1 #Assumption
+
+def wav2mfcc(file_path, max_pad_len=512):
+#Generate mfcc from wav
+	wave, sr = librosa.load(file_path, mono=True, sr=None)
+	wave = wave[::3]
+	mfcc = librosa.feature.mfcc(wave)
+	pad_width = max_pad_len - mfcc.shape[1]
+	mfcc = np.pad(mfcc, pad_width=((0, 0), (0, pad_width)), mode='constant')
+	return mfcc
 
 def precision(y_true, y_pred):
 	true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
