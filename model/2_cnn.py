@@ -94,16 +94,19 @@ model.add(Dropout(0.5))
 
 model.add(Dense(int(max(y_train))+1, activation='softmax'))
 
-model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0),metrics = [precision])
-#model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(lr=0.5, rho=0.95, epsilon=1e-08, decay=0.0),metrics = [precision])
+#model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0),metrics = [precision])
+model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=1e-08, decay=0.0),metrics = [precision])
 
-model.fit(X_train, y_train_hot, batch_size=64, epochs=1024, verbose=1, validation_data=(X_test, y_test_hot))
+learning_rate_reduction = keras.callbacks.ReduceLROnPlateau(monitor='val_loss',patience=5,verbose=1,factor=0.5,min_lr=0.001)
+
+model.fit(X_train, y_train_hot, batch_size=64, epochs=512, verbose=1, validation_data=(X_test, y_test_hot))
 
 ### Testing
 # Getting the MFCC
 from pprint import pprint
 test_list = [
 		"../testing/test.wav",
+		"../testing/test2.wav",
 		"../testing/001003.mp3.wav",
 		"../testing/001005.mp3.wav",
 		]
