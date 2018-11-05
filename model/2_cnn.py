@@ -71,34 +71,40 @@ y_train_hot = to_categorical(y_train)
 y_test_hot = to_categorical(y_test)
 
 model = Sequential()
-model.add(Conv2D(32, kernel_size=(2, 2), activation='relu', input_shape=(X_train.shape[1], X_train.shape[2], channel)))
+model.add(Conv2D(16, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(0.001), input_shape=(X_train.shape[1], X_train.shape[2], channel)))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.5))
 
-model.add(Conv2D(32, kernel_size=(2, 2), activation='relu'))
+model.add(Conv2D(16, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.5))
 
 model.add(Flatten())
 
-model.add(Dense(32, activation='relu'))
+model.add(Dense(16, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
+model.add(Dropout(0.5))
+
+model.add(Dense(16, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
 model.add(Dropout(0.5))
 
 model.add(Dense(int(max(y_train))+1, activation='softmax'))
 
 model.compile(loss=keras.losses.categorical_crossentropy,optimizer=optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0),metrics = [precision])
 
-# Set a learning rate annealer
-learning_rate_reduction = callbacks.ReduceLROnPlateau(monitor='val_precision',
-                                            patience=3,
-                                            verbose=1,
-                                            factor=0.5,
-                                            min_lr=0.00001)
-
-model.fit(X_train, y_train_hot, batch_size=32, epochs=1024, verbose=1, validation_data=(X_test, y_test_hot),callbacks=[learning_rate_reduction])
+model.fit(X_train, y_train_hot, batch_size=64, epochs=1024, verbose=1, validation_data=(X_test, y_test_hot))
 
 ### Testing
 # Getting the MFCC
 sample = wav2mfcc('../testing/test.wav')
 sample_reshaped = sample.reshape(1, X_train.shape[1], X_train.shape[2], channel)
 print("Predicted label: "+get_labels()[0][np.argmax(model.predict(sample_reshaped))])
+
+sample = wav2mfcc('../testing/001003.mp3.wav')
+sample_reshaped = sample.reshape(1, X_train.shape[1], X_train.shape[2], channel)
+print("Predicted label: "+get_labels()[0][np.argmax(model.predict(sample_reshaped))])
+
+sample = wav2mfcc('../testing/001005.mp3.wav')
+sample_reshaped = sample.reshape(1, X_train.shape[1], X_train.shape[2], channel)
+print("Predicted label: "+get_labels()[0][np.argmax(model.predict(sample_reshaped))])
+
+
