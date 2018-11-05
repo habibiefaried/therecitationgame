@@ -6,6 +6,8 @@ import librosa
 import numpy as np
 import ConfigParser
 
+counter = 1
+
 configParser = ConfigParser.RawConfigParser()
 configFilePath = r'../config/model.conf'
 configParser.read(configFilePath)
@@ -22,47 +24,9 @@ if (isReDownload):
 
 os.system("rm -rf ../dataset") #clearing folder dataset first
 
-def download(urls):
-	i = 1
-	rename_surah = "{0:0=3d}".format(surah)
-
-	for url in urls:
-		folder_t = "../audio/"+str(i)
-		os.system("mkdir -p "+folder_t)
-		file_name = folder_t+"/"+rename_surah+".zip"
-
-		print "Downloading: "+url+rename_surah+".zip"
-		testfile = urllib.URLopener()
-		testfile.retrieve(url+rename_surah+".zip", file_name)
-
-		print "Unzipping..."
-		zip_ref = zipfile.ZipFile(file_name, 'r')
-		zip_ref.extractall(folder_t)
-		zip_ref.close()
-
-		i = i + 1
-
-def analysis(max_pad_len=512):
-	os.system("mkdir ../dataset")
-	for ayah in range(1,total_ayah+1):
-		mfcc_vectors = []
-
-		for reciter in range(1,len(urls)+1):
-			#Analysis take
-			print "[+]  progress: "+str(reciter)+"-"+"{0:0=3d}".format(ayah)
-			wave, sr = librosa.load("../audio/"+str(reciter)+"/"+"{0:0=3d}".format(surah)+"{0:0=3d}".format(ayah)+".mp3.wav", mono=True, sr=None)
-		    	wave = wave[::3]
-		    	mfcc = librosa.feature.mfcc(wave, sr)
-			print "[+] Detected pad_len : "+str(mfcc.shape[1])
-		    	pad_width = max_pad_len - mfcc.shape[1]
-		    	mfcc = np.pad(mfcc, pad_width=((0, 0), (0, pad_width)), mode='constant')
-
-			#append to mfcc_vectors
-			mfcc_vectors.append(mfcc)
-
-		np.save("../dataset/ayat-"+str(ayah)+".npy", mfcc_vectors)
-
-urls = [
+def download_1():
+	global counter
+	urls = [
 		"http://www.everyayah.com/data/Abdul_Basit_Murattal_64kbps/zips/",
 		"http://www.everyayah.com/data/Abdullah_Basfar_64kbps/zips/",
 		"http://www.everyayah.com/data/Abdurrahmaan_As-Sudais_64kbps/zips/",
@@ -115,8 +79,154 @@ urls = [
 		"http://www.everyayah.com/data/khalefa_al_tunaiji_64kbps/zips/",
 		]
 
+	#from versebyverse quran
+	rename_surah = "{0:0=3d}".format(surah)
+
+	for url in urls:
+		folder_t = "../audio/"+str(counter)
+		os.system("mkdir -p "+folder_t)
+		file_name = folder_t+"/"+rename_surah+".zip"
+
+		print "Downloading: "+url+rename_surah+".zip"
+		testfile = urllib.URLopener()
+		testfile.retrieve(url+rename_surah+".zip", file_name)
+
+		print "Unzipping..."
+		zip_ref = zipfile.ZipFile(file_name, 'r')
+		zip_ref.extractall(folder_t)
+		zip_ref.close()
+
+		counter = counter + 1
+
+def download_2():
+	#from https://verses.quran.com
+	#from houseofquran.com
+	import ssl
+
+	ctx = ssl.create_default_context()
+	ctx.check_hostname = False
+	ctx.verify_mode = ssl.CERT_NONE
+
+	global counter
+	urls = [
+		"https://verses.quran.com/AbdulBaset/Mujawwad/mp3/",
+		"https://verses.quran.com/AbdulBaset/Murattal/mp3/",
+		"https://verses.quran.com/Alafasy/mp3/",
+		"https://verses.quran.com/Minshawi/Mujawwad/mp3/",
+		"https://verses.quran.com/Minshawi/Murattal/mp3/",
+		"https://verses.quran.com/Rifai/mp3/",
+		"https://verses.quran.com/Shatri/mp3/",
+		"https://verses.quran.com/Shuraym/mp3/",
+		"https://verses.quran.com/Sudais/mp3/",
+		"http://1c.houseofquran.com/Alafasy40kps1/",
+		"http://1c.houseofquran.com/MinshaweeMurtal1/",
+		"http://1c.houseofquran.com/Hussary1/",
+		"http://1c.houseofquran.com/HusaryFaster/",
+		"http://1c.houseofquran.com/HussaryMualim/",
+		"http://1c.houseofquran.com/Basit40kbps1/",
+		"http://1c.houseofquran.com/Gamedi1/",
+		"http://1c.houseofquran.com/Hudhaify_32kbps/",
+		"http://1c.houseofquran.com/Mostafa_Ismail_128kbps/",
+		"http://1c.houseofquran.com/tunaiji_64kbps/",
+		"http://1c.houseofquran.com/mahmoud_ali_al_banna_32kbps/",
+		"http://1c.houseofquran.com/Ayman_Sowaid_64kbps/",
+		"http://1c.houseofquran.com/tunaiji_teacher/",
+		"http://1c.houseofquran.com/Ibrahim_Akhdar_32kbps/",
+		"http://1c.houseofquran.com/Muhammad_Ayyoub_64kbps/",
+		"http://1c.houseofquran.com/Hani_Rifai_192kbps/",
+		"http://1c.houseofquran.com/Abdurrahmaan_As-Sudais_64kbps/",
+		"http://1c.houseofquran.com/Abdullaah_3awwaad_Al-Juhaynee_128kbps/",
+		"http://1c.houseofquran.com/Maher_AlMuaiqly_64kbps/",
+		"http://1c.houseofquran.com/Minshawy_Mujawwad_64kbps/",
+		"http://1c.houseofquran.com/Abu_Bakr_Ash-Shaatree_64kbps/",
+		"http://1c.houseofquran.com/Ahmed_ibn_Ali_al-Ajamy_64kbps/",
+		"http://1c.houseofquran.com/Muhammad_Jibreel_64kbps/",
+		"http://1c.houseofquran.com/Mohammad_al_Tablaway_64kbps/",
+		"http://1c.houseofquran.com/Yaser_Salamah_128kbps/",
+		"http://1c.houseofquran.com/Muhsin_Al_Qasim_192kbps/",
+		"http://1c.houseofquran.com/Nasser_Alqatami_128kbps/",
+		"http://1c.houseofquran.com/warsh_husary_64kbps/",
+		"http://1c.houseofquran.com/warsh/warsh_ibrahim_aldosary_128kbps/",
+		"http://audio.recitequran.com/vbv/arabic/abdul-basit_abdus-samad_murattal/",
+		"http://audio.recitequran.com/vbv/arabic/abdul-basit_abdus-samad_mujawwad/",
+		"http://audio.recitequran.com/vbv/arabic/abdul-muhsin_al-qasim/",
+		"http://audio.recitequran.com/vbv/arabic/abdullah_awwad_al-juhani/",
+		"http://audio.recitequran.com/vbv/arabic/abdullah_basfar/",
+		"http://audio.recitequran.com/vbv/arabic/abdullah_matroud/",
+		"http://audio.recitequran.com/vbv/arabic/abdur-rahman_as-sudais/",
+		"http://audio.recitequran.com/vbv/arabic/abu_bakr_ash-shatiri/",
+		"http://audio.recitequran.com/vbv/arabic/ahmad_al-ajmi/",
+		"http://audio.recitequran.com/vbv/arabic/al-hasan_buraiyyah/",
+		"http://audio.recitequran.com/vbv/arabic/ali_al-hudthayfi/",
+		"http://audio.recitequran.com/vbv/arabic/ali_hajjaj_as-suwaysi/",
+		"http://audio.recitequran.com/vbv/arabic/ali_jabir/",
+		"http://audio.recitequran.com/vbv/arabic/hani_ar-rifai/",
+		"http://audio.recitequran.com/vbv/arabic/ibrahim_al-akhdar/",
+		"http://audio.recitequran.com/vbv/arabic/jazza_as-suwaylih/",
+		"http://audio.recitequran.com/vbv/arabic/khalid_abdullah_al-qahtani/",
+		"http://audio.recitequran.com/vbv/arabic/khalifah_at-tunayji/",
+		"http://audio.recitequran.com/vbv/arabic/maher_al-muayqli/",
+		"http://audio.recitequran.com/vbv/arabic/mahmoud_ali_al-banna/",
+		"http://audio.recitequran.com/vbv/arabic/mahmoud_khalil_al-husari_mujawwad/",
+		"http://audio.recitequran.com/vbv/arabic/mahmoud_khalil_al-husari_murattal/",
+		"http://audio.recitequran.com/vbv/arabic/mahmoud_khalil_al-husari_teacher/",
+		"http://audio.recitequran.com/vbv/arabic/mishary_al-afasy/",
+		"http://audio.recitequran.com/vbv/arabic/mishary_al-afasy_teacher/",
+		"http://audio.recitequran.com/vbv/arabic/muhammad_abdul-karim/",
+		"http://audio.recitequran.com/vbv/arabic/muhammad_at-tablawi/",
+		"http://audio.recitequran.com/vbv/arabic/muhammad_ayyoub/",
+		"http://audio.recitequran.com/vbv/arabic/muhammad_jibril/",
+		"http://audio.recitequran.com/vbv/arabic/muhammad_siddiq_al-minshawi_mujawwad/",
+		"http://audio.recitequran.com/vbv/arabic/muhammad_siddiq_al-minshawi_murattal/",
+		"http://audio.recitequran.com/vbv/arabic/muhammad_siddiq_al-minshawi_teacher/",
+		"http://audio.recitequran.com/vbv/arabic/nasir_al-qatami/",
+		"http://audio.recitequran.com/vbv/arabic/sad_al-ghamidi/",
+		"http://audio.recitequran.com/vbv/arabic/saud_ash-shuraim/",
+		"http://audio.recitequran.com/vbv/arabic/salah_al-budair/",
+		"http://audio.recitequran.com/vbv/arabic/salah_bukhatir/",
+		"http://audio.recitequran.com/vbv/arabic/taha_al-junaid/",
+		"http://audio.recitequran.com/vbv/arabic/yasir_salamah/",
+		"http://audio.recitequran.com/vbv/arabic/yusuf_kalo/",
+	]
+
+	for url in urls:
+		folder_t = "../audio/"+str(counter)+"/"
+		os.system("mkdir -p "+folder_t)
+
+		print "Downloading "+url
+		
+		for ayah in range(1,total_ayah+1):
+			testfile = urllib.URLopener(context=ctx)
+			file_name = "{0:0=3d}".format(surah)+"{0:0=3d}".format(ayah)+".mp3"
+			testfile.retrieve(url+file_name,folder_t+file_name)
+
+		counter = counter+1
+
+def analysis(max_pad_len=512):
+	global counter
+	os.system("mkdir ../dataset")
+	for ayah in range(1,total_ayah+1):
+		mfcc_vectors = []
+
+		for reciter in range(1,counter):
+			#Analysis take
+			print "[+]  progress: "+str(reciter)+"-"+"{0:0=3d}".format(ayah)
+			wave, sr = librosa.load("../audio/"+str(reciter)+"/"+"{0:0=3d}".format(surah)+"{0:0=3d}".format(ayah)+".mp3.wav", mono=True, sr=None)
+		    	wave = wave[::3]
+		    	mfcc = librosa.feature.mfcc(wave, sr)
+			print "[+] Detected pad_len : "+str(mfcc.shape[1])
+		    	pad_width = max_pad_len - mfcc.shape[1]
+		    	mfcc = np.pad(mfcc, pad_width=((0, 0), (0, pad_width)), mode='constant')
+
+			#append to mfcc_vectors
+			mfcc_vectors.append(mfcc)
+
+		np.save("../dataset/ayat-"+str(ayah)+".npy", mfcc_vectors)
+
+
 if (isReDownload):
-	download(urls)
+	download_1()
+	download_2()
 	print "Converting all of the files to wav..."
 	result = [y for x in os.walk("../audio") for y in glob(os.path.join(x[0], '*.mp3'))]
 
