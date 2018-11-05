@@ -95,16 +95,15 @@ model.fit(X_train, y_train_hot, batch_size=64, epochs=1024, verbose=1, validatio
 
 ### Testing
 # Getting the MFCC
-sample = wav2mfcc('../testing/test.wav')
-sample_reshaped = sample.reshape(1, X_train.shape[1], X_train.shape[2], channel)
-print("Predicted label: "+get_labels()[0][np.argmax(model.predict(sample_reshaped))])
+from pprint import pprint
+test_list = [
+		"../testing/test.wav",
+		"../testing/001003.mp3.wav",
+		"../testing/001005.mp3.wav",
+		]
 
-sample = wav2mfcc('../testing/001003.mp3.wav')
-sample_reshaped = sample.reshape(1, X_train.shape[1], X_train.shape[2], channel)
-print("Predicted label: "+get_labels()[0][np.argmax(model.predict(sample_reshaped))])
-
-sample = wav2mfcc('../testing/001005.mp3.wav')
-sample_reshaped = sample.reshape(1, X_train.shape[1], X_train.shape[2], channel)
-print("Predicted label: "+get_labels()[0][np.argmax(model.predict(sample_reshaped))])
-
-
+for t in test_list:
+	sample = wav2mfcc(t)
+	sample_reshaped = sample.reshape(1, X_train.shape[1], X_train.shape[2], channel)
+	pprint(model.predict(sample_reshaped))
+	print("Predicted label: "+get_labels()[0][np.argmax(model.predict(sample_reshaped))])
