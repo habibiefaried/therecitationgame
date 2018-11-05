@@ -5,7 +5,7 @@ from glob import glob
 import librosa
 import numpy as np
 
-isReDownload = True
+isReDownload = False
 surah = 1 
 total_ayah = 7
 
@@ -16,10 +16,10 @@ os.system("rm -rf ../dataset/*") #clearing folder dataset first
 
 def download(urls):
 	i = 1
-	folder_t = "../audio/"+str(i)
 	rename_surah = "{0:0=3d}".format(surah)
 
 	for url in urls:
+		folder_t = "../audio/"+str(i)
 		os.system("mkdir -p "+folder_t)
 		file_name = folder_t+"/"+rename_surah+".zip"
 
@@ -34,7 +34,7 @@ def download(urls):
 
 		i = i + 1
 
-def analysis(max_pad_len=11):
+def analysis(max_pad_len=500):
 	for ayah in range(1,total_ayah+1):
 		mfcc_vectors = []
 
@@ -44,6 +44,7 @@ def analysis(max_pad_len=11):
 			wave, sr = librosa.load("../audio/"+str(reciter)+"/"+"{0:0=3d}".format(surah)+"{0:0=3d}".format(ayah)+".mp3.wav", mono=True, sr=None)
 		    	wave = wave[::3]
 		    	mfcc = librosa.feature.mfcc(wave, sr)
+			print "[+] Detected pad_len : "+str(mfcc.shape[1])
 		    	pad_width = max_pad_len - mfcc.shape[1]
 		    	mfcc = np.pad(mfcc, pad_width=((0, 0), (0, pad_width)), mode='constant')
 
@@ -107,14 +108,13 @@ urls = [
 
 if (isReDownload):
 	download(urls)
+	print "Converting all of the files to wav..."
+	result = [y for x in os.walk("../audio") for y in glob(os.path.join(x[0], '*.mp3'))]
+
+	for r in result:
+        	print "Processing: ffmpeg -i "+r+" -acodec pcm_u8 -ar 22050 "+r+".wav > /dev/null 2>&1"
+        	os.system("ffmpeg -i "+r+" -acodec pcm_u8 -ar 22050 "+r+".wav > /dev/null 2>&1")
 else:
 	print "Skipping download"
-
-print "Converting all of the files to wav..."
-result = [y for x in os.walk("../audio") for y in glob(os.path.join(x[0], '*.mp3'))]
-
-for r in result:
-	print "Processing: ffmpeg -i "+r+" -acodec pcm_u8 -ar 22050 "+r+".wav > /dev/null 2>&1"
-	os.system("ffmpeg -i "+r+" -acodec pcm_u8 -ar 22050 "+r+".wav > /dev/null 2>&1")
 
 analysis()
