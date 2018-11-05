@@ -93,5 +93,4 @@ sample = wav2mfcc('../testing/test.wav')
 # We need to reshape it remember?
 sample_reshaped = sample.reshape(1, X_train.shape[1], X_train.shape[2], channel)
 # Perform forward pass
-print("Predicted test file: "+np.argmax(model.predict(sample_reshaped)))
-# Output: 'happy'
+print("Predicted label: "+get_labels()[0][np.argmax(model.predict(sample_reshaped))])
