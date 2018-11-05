@@ -34,10 +34,8 @@ def download(urls):
 
 		i = i + 1
 
-def analysis():
+def analysis(max_pad_len=11):
 	for ayah in range(1,total_ayah+1):
-		folder_target = "../dataset/"+str(ayah)+"/"
-		os.system("mkdir -p "+folder_target)
 		mfcc_vectors = []
 
 		for reciter in range(1,len(urls)+1):	
@@ -52,7 +50,7 @@ def analysis():
 			#append to mfcc_vectors
 			mfcc_vectors.append(mfcc)
 
-		np.save("ayat-"+str(ayah)+".npy", mfcc_vectors)
+		np.save("../dataset/ayat-"+str(ayah)+".npy", mfcc_vectors)
 
 urls = [		
 		"http://www.everyayah.com/data/Abdul_Basit_Murattal_64kbps/zips/",
