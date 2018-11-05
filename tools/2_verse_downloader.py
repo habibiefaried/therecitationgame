@@ -5,7 +5,7 @@ from glob import glob
 import librosa
 import numpy as np
 
-isReDownload = False
+isReDownload = True
 surah = 1
 total_ayah = 7
 

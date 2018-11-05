@@ -15,17 +15,11 @@ import tensorflow as tf
 
 channel = 1 #Assumption
 
-#Copying tensorflow
-def as_keras_metric(method):
-    @functools.wraps(method)
-    def wrapper(self, args, **kwargs):
-        """ Wrapper for turning tensorflow metrics into keras metrics """
-        value, update_op = method(self, args, **kwargs)
-        K.get_session().run(tf.local_variables_initializer())
-        with tf.control_dependencies([update_op]):
-            value = tf.identity(value)
-        return value
-    return wrapper
+def precision(y_true, y_pred):
+	true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+	predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+	precision = true_positives / (predicted_positives + K.epsilon())
+	return precision
 
 # Input: Folder Path
 # Output: Tuple (Label, Indices of the labels, one-hot encoded labels)
@@ -34,7 +28,7 @@ def get_labels(path="../dataset/"):
 	label_indices = np.arange(0, len(labels))
 	return labels, label_indices, to_categorical(label_indices)
 
-def get_train_test(path="../dataset/", split_ratio=0.6, random_state=42):
+def get_train_test(path="../dataset/", split_ratio=0.8, random_state=42):
     # Get available labels
     labels, indices, _ = get_labels(path)
 
@@ -77,6 +71,7 @@ model.add(Dropout(0.25))
 model.add(Dense(64, activation='relu'))
 model.add(Dropout(0.4))
 model.add(Dense(int(max(y_train))+1, activation='softmax'))
-model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(),metrics = [as_keras_metric(tf.metrics.precision)])
+#model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(),metrics = [as_keras_metric(tf.metrics.precision)])
+model.compile(loss=keras.losses.categorical_crossentropy,optimizer="adam",metrics = [precision])
 
-model.fit(X_train, y_train_hot, batch_size=16, epochs=256, verbose=1, validation_data=(X_test, y_test_hot))
+model.fit(X_train, y_train_hot, batch_size=128, epochs=1024, verbose=1, validation_data=(X_test, y_test_hot))
