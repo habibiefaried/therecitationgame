@@ -9,3 +9,5 @@ pprint
 python-telegram-bot
 pymongo
 dnspython
+librosa
+numpy
