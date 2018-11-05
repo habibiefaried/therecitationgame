@@ -11,3 +11,4 @@ pymongo
 dnspython
 librosa
 numpy
+ConfigParser

@@ -4,15 +4,23 @@ import zipfile
 from glob import glob
 import librosa
 import numpy as np
+import ConfigParser
+
+configParser = ConfigParser.RawConfigParser()
+configFilePath = r'../config/model.conf'
+configParser.read(configFilePath)
 
 isReDownload = True
-surah = 1
-total_ayah = 7
+if (configParser.get("ml-config", "redownload") == "0"):
+	isReDownload = False
+
+surah = int(configParser.get("ml-config","surah"))
+total_ayah = int(configParser.get("ml-config","total_ayah"))
 
 if (isReDownload):
 	os.system("rm -rf ../audio/*") #clearing folder audio first
 
-os.system("rm -rf ../dataset/*") #clearing folder dataset first
+os.system("rm -rf ../dataset") #clearing folder dataset first
 
 def download(urls):
 	i = 1
