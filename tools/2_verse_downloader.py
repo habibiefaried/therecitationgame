@@ -38,21 +38,21 @@ def analysis(max_pad_len=11):
 	for ayah in range(1,total_ayah+1):
 		mfcc_vectors = []
 
-		for reciter in range(1,len(urls)+1):	
-			#Analysis take 
+		for reciter in range(1,len(urls)+1):
+			#Analysis take
 			print "[+]  progress: "+str(reciter)+"-"+"{0:0=3d}".format(ayah)
 			wave, sr = librosa.load("../audio/"+str(reciter)+"/"+"{0:0=3d}".format(surah)+"{0:0=3d}".format(ayah)+".mp3.wav", mono=True, sr=None)
-		    wave = wave[::3]
-		    mfcc = librosa.feature.mfcc(wave, sr)
-		    pad_width = max_pad_len - mfcc.shape[1]
-		    mfcc = np.pad(mfcc, pad_width=((0, 0), (0, pad_width)), mode='constant')
-			
+		    	wave = wave[::3]
+		    	mfcc = librosa.feature.mfcc(wave, sr)
+		    	pad_width = max_pad_len - mfcc.shape[1]
+		    	mfcc = np.pad(mfcc, pad_width=((0, 0), (0, pad_width)), mode='constant')
+
 			#append to mfcc_vectors
 			mfcc_vectors.append(mfcc)
 
 		np.save("../dataset/ayat-"+str(ayah)+".npy", mfcc_vectors)
 
-urls = [		
+urls = [
 		"http://www.everyayah.com/data/Abdul_Basit_Murattal_64kbps/zips/",
 		"http://www.everyayah.com/data/Abdullah_Basfar_64kbps/zips/",
 		"http://www.everyayah.com/data/Abdurrahmaan_As-Sudais_64kbps/zips/",
