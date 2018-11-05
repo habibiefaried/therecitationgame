@@ -8,6 +8,8 @@ import keras
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D
 from keras.utils import to_categorical
+from keras import optimizers
+from keras import callbacks
 import functools
 from keras import backend as K
 import tensorflow as tf
@@ -84,8 +86,16 @@ model.add(Dropout(0.5))
 
 model.add(Dense(int(max(y_train))+1, activation='softmax'))
 
-model.compile(loss=keras.losses.categorical_crossentropy,optimizer="adam",metrics = [precision])
-model.fit(X_train, y_train_hot, batch_size=32, epochs=1024, verbose=1, validation_data=(X_test, y_test_hot))
+model.compile(loss=keras.losses.categorical_crossentropy,optimizer=optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0),metrics = [precision])
+
+# Set a learning rate annealer
+learning_rate_reduction = callbacks.ReduceLROnPlateau(monitor='val_precision',
+                                            patience=3,
+                                            verbose=1,
+                                            factor=0.5,
+                                            min_lr=0.00001)
+
+model.fit(X_train, y_train_hot, batch_size=32, epochs=1024, verbose=1, validation_data=(X_test, y_test_hot),callbacks=[learning_rate_reduction])
 
 ### Testing
 # Getting the MFCC
