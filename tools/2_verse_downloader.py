@@ -6,7 +6,7 @@ import librosa
 import numpy as np
 
 isReDownload = False
-surah = 1 
+surah = 1
 total_ayah = 7
 
 if (isReDownload):
@@ -34,7 +34,8 @@ def download(urls):
 
 		i = i + 1
 
-def analysis(max_pad_len=500):
+def analysis(max_pad_len=512):
+	os.system("mkdir ../dataset")
 	for ayah in range(1,total_ayah+1):
 		mfcc_vectors = []
 
