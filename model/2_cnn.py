@@ -71,26 +71,24 @@ y_test_hot = to_categorical(y_test)
 model = Sequential()
 model.add(Conv2D(32, kernel_size=(2, 2), activation='relu', input_shape=(X_train.shape[1], X_train.shape[2], channel)))
 model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Dropout(0.25))
+model.add(Dropout(0.5))
 
-#model.add(Conv2D(64, kernel_size=(2, 2), activation='relu'))
-#model.add(MaxPooling2D(pool_size=(2, 2)))
-#model.add(Dropout(0.25))
+model.add(Conv2D(32, kernel_size=(2, 2), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Dropout(0.5))
 
 model.add(Flatten())
+
 model.add(Dense(32, activation='relu'))
-model.add(Dropout(0.25))
+model.add(Dropout(0.5))
 
 model.add(Dense(int(max(y_train))+1, activation='softmax'))
 
-#model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(),metrics = [as_keras_metric(tf.metrics.precision)])
 model.compile(loss=keras.losses.categorical_crossentropy,optimizer="adam",metrics = [precision])
 model.fit(X_train, y_train_hot, batch_size=32, epochs=1024, verbose=1, validation_data=(X_test, y_test_hot))
 
 ### Testing
 # Getting the MFCC
 sample = wav2mfcc('../testing/test.wav')
-# We need to reshape it remember?
 sample_reshaped = sample.reshape(1, X_train.shape[1], X_train.shape[2], channel)
-# Perform forward pass
 print("Predicted label: "+get_labels()[0][np.argmax(model.predict(sample_reshaped))])
