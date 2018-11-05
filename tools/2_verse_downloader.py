@@ -156,7 +156,6 @@ def download_2():
 		"http://audio.recitequran.com/vbv/arabic/abdur-rahman_as-sudais/",
 		"http://audio.recitequran.com/vbv/arabic/abu_bakr_ash-shatiri/",
 		"http://audio.recitequran.com/vbv/arabic/ahmad_al-ajmi/",
-		"http://audio.recitequran.com/vbv/arabic/al-hasan_buraiyyah/",
 		"http://audio.recitequran.com/vbv/arabic/ali_al-hudthayfi/",
 		"http://audio.recitequran.com/vbv/arabic/ali_hajjaj_as-suwaysi/",
 		"http://audio.recitequran.com/vbv/arabic/ali_jabir/",
@@ -171,7 +170,6 @@ def download_2():
 		"http://audio.recitequran.com/vbv/arabic/mahmoud_khalil_al-husari_murattal/",
 		"http://audio.recitequran.com/vbv/arabic/mahmoud_khalil_al-husari_teacher/",
 		"http://audio.recitequran.com/vbv/arabic/mishary_al-afasy/",
-		"http://audio.recitequran.com/vbv/arabic/mishary_al-afasy_teacher/",
 		"http://audio.recitequran.com/vbv/arabic/muhammad_abdul-karim/",
 		"http://audio.recitequran.com/vbv/arabic/muhammad_at-tablawi/",
 		"http://audio.recitequran.com/vbv/arabic/muhammad_ayyoub/",
@@ -184,9 +182,7 @@ def download_2():
 		"http://audio.recitequran.com/vbv/arabic/saud_ash-shuraim/",
 		"http://audio.recitequran.com/vbv/arabic/salah_al-budair/",
 		"http://audio.recitequran.com/vbv/arabic/salah_bukhatir/",
-		"http://audio.recitequran.com/vbv/arabic/taha_al-junaid/",
 		"http://audio.recitequran.com/vbv/arabic/yasir_salamah/",
-		"http://audio.recitequran.com/vbv/arabic/yusuf_kalo/",
 	]
 
 	for url in urls:
@@ -194,7 +190,7 @@ def download_2():
 		os.system("mkdir -p "+folder_t)
 
 		print "Downloading "+url
-		
+
 		for ayah in range(1,total_ayah+1):
 			testfile = urllib.URLopener(context=ctx)
 			file_name = "{0:0=3d}".format(surah)+"{0:0=3d}".format(ayah)+".mp3"
