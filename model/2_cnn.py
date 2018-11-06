@@ -109,6 +109,7 @@ test_list = [
 		"../testing"+int(surah)+"/test2.wav",
 		"../testing"+int(surah)+"/001003.mp3.wav",
 		"../testing"+int(surah)+"/001005.mp3.wav",
+		"../testing/outlier.wav"
 		]
 test_answer = [
 		"ayat-1",
@@ -125,8 +126,9 @@ for t in test_list:
 	pprint(model.predict(sample_reshaped))
 	answer = get_labels()[0][np.argmax(model.predict(sample_reshaped))]
 	print("Predicted label: "+answer)
-	assert answer == test_answer[i] #my voice must be recognized first, create the label later
-	i = i+1
+	if (t != "../testing/outlier.wav"): #no need to assert outlier
+		assert answer == test_answer[i] #my voice must be recognized first, create the label later
+		i = i+1
 
 #Saving model
 model.save("../generatedmodel/surah-"+int(surah)+"-model.h5")
