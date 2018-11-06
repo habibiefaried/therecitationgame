@@ -1,15 +1,15 @@
-from sklearn.model_selection import train_test_split
-from keras.utils import to_categorical
+#from preprocess import *
 import numpy as np
-from preprocess import *
 import keras
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D
-from keras.utils import to_categorical
-from keras import backend as K
-import tensorflow as tf
 import librosa
 import ConfigParser
+
+from sklearn.model_selection import train_test_split
+from keras.utils import to_categorical
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D
+from keras import backend as K
+
 
 configParser = ConfigParser.RawConfigParser()
 configFilePath = r'../config/model.conf'
@@ -110,12 +110,23 @@ test_list = [
 		"../testing/001003.mp3.wav",
 		"../testing/001005.mp3.wav",
 		]
+test_answer = [
+		"ayat-1",
+		"ayat-1",
+		"ayat-3",
+		"ayat-5",
+]
 
-print "Labels available"
-pprint(get_labels())
+i = 0
 
 for t in test_list:
 	sample = wav2mfcc(t)
 	sample_reshaped = sample.reshape(1, X_train.shape[1], X_train.shape[2], channel)
 	pprint(model.predict(sample_reshaped))
-	print("Predicted label: "+get_labels()[0][np.argmax(model.predict(sample_reshaped))])
+	answer = get_labels()[0][np.argmax(model.predict(sample_reshaped))]
+	print("Predicted label: "+answer)
+	assert answer == test_answer[i] #my voice must be recognized first, create the label later
+	i = i+1
+
+#Saving model
+model.save("../generatedmodel/surah-"+int(surah)+"-model.h5")

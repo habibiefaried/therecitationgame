@@ -12,3 +12,4 @@ dnspython
 librosa
 numpy
 ConfigParser
+h5py
