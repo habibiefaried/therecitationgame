@@ -32,35 +32,20 @@ def wav2mfcc(file_path, max_pad_len=512):
 
 # Metrics
 ## https://stackoverflow.com/questions/43547402/how-to-calculate-f1-macro-in-keras
+def precision(y_true, y_pred):
+	true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+	predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+	return true_positives / (predicted_positives + K.epsilon())
+
+def recall(y_true, y_pred):
+	true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+	possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+	return true_positives / (possible_positives + K.epsilon())
+
 def f1(y_true, y_pred):
-    def recall(y_true, y_pred):
-        """Recall metric.
-
-        Only computes a batch-wise average of recall.
-
-        Computes the recall, a metric for multi-label classification of
-        how many relevant items are selected.
-        """
-        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-        possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
-        recall = true_positives / (possible_positives + K.epsilon())
-        return recall
-
-    def precision(y_true, y_pred):
-        """Precision metric.
-
-        Only computes a batch-wise average of precision.
-
-        Computes the precision, a metric for multi-label classification of
-        how many selected items are relevant.
-        """
-        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-        predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
-        precision = true_positives / (predicted_positives + K.epsilon())
-        return precision
-    precision = precision(y_true, y_pred)
-    recall = recall(y_true, y_pred)
-    return 2*((precision*recall)/(precision+recall+K.epsilon()))
+	p = precision(y_true, y_pred)
+	r = recall(y_true, y_pred)
+	return 2*((p*r)/(p+r+K.epsilon()))
 
 # Input: Folder Path
 # Output: Tuple (Label, Indices of the labels, one-hot encoded labels)
@@ -128,8 +113,8 @@ model.add(Dropout(0.5))
 
 model.add(Dense(int(max(y_train))+1, activation='softmax'))
 
-#model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(),metrics = [f1])
-model.compile(loss=keras.losses.categorical_crossentropy,optimizer="adam",metrics = [f1])
+model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(),metrics = [f1,precision])
+#model.compile(loss=keras.losses.categorical_crossentropy,optimizer="adam",metrics = [f1,precision])
 tensorboard = TensorBoard(log_dir="/tmp/logs/{}".format(time()))
 model.fit(X_train, y_train_hot, batch_size=128, epochs=total_ayah*512, verbose=1, validation_data=(X_test, y_test_hot),callbacks=[tensorboard])
 
