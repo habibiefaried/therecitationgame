@@ -1,103 +1,163 @@
-# Convolutional Neural Network
+#from preprocess import *
+import numpy as np
+import keras
+import librosa
+import ConfigParser
 
-# Installing Theano
-# pip install --upgrade --no-deps git+git://github.com/Theano/Theano.git
-
-# Installing Tensorflow
-# pip install tensorflow
-
-# Installing Keras
-# pip install --upgrade keras
-
-# Part 1 - Building the CNN
-
-# Importing the Keras libraries and packages
+from sklearn.model_selection import train_test_split
+from keras.utils import to_categorical
 from keras.models import Sequential
-from keras.layers import Conv2D
-from keras.layers import MaxPooling2D
-from keras.layers import Flatten
-from keras.layers import Dense
+from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D
+from keras import backend as K
+
+
+configParser = ConfigParser.RawConfigParser()
+configFilePath = r'../config/model.conf'
+configParser.read(configFilePath)
+
+surah = int(configParser.get("ml-config","surah"))
+total_ayah = int(configParser.get("ml-config","total_ayah"))
+channel = 1 #treat wave as 1 channel image
+
+def wav2mfcc(file_path, max_pad_len=512):
+#Generate mfcc from wav
+	wave, sr = librosa.load(file_path, mono=True, sr=None)
+	wave = wave[::3]
+	mfcc = librosa.feature.mfcc(wave)
+	pad_width = max_pad_len - mfcc.shape[1]
+	mfcc = np.pad(mfcc, pad_width=((0, 0), (0, pad_width)), mode='constant')
+	return mfcc
+
+# Metrics
+## https://stackoverflow.com/questions/43547402/how-to-calculate-f1-macro-in-keras
+def f1(y_true, y_pred):
+    def recall(y_true, y_pred):
+        """Recall metric.
+
+        Only computes a batch-wise average of recall.
+
+        Computes the recall, a metric for multi-label classification of
+        how many relevant items are selected.
+        """
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+        recall = true_positives / (possible_positives + K.epsilon())
+        return recall
+
+    def precision(y_true, y_pred):
+        """Precision metric.
+
+        Only computes a batch-wise average of precision.
+
+        Computes the precision, a metric for multi-label classification of
+        how many selected items are relevant.
+        """
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+        precision = true_positives / (predicted_positives + K.epsilon())
+        return precision
+    precision = precision(y_true, y_pred)
+    recall = recall(y_true, y_pred)
+    return 2*((precision*recall)/(precision+recall+K.epsilon()))
+
+# Input: Folder Path
+# Output: Tuple (Label, Indices of the labels, one-hot encoded labels)
+def get_labels():
+	labels = []
+	for i in range(1, total_ayah+1):
+		labels.append("ayat-"+str(i))
+
+	label_indices = np.arange(0, len(labels))
+	return labels, label_indices, to_categorical(label_indices)
+
+def get_train_test(split_ratio=0.75, random_state=42):
+    # Get available labels
+    labels, indices, _ = get_labels()
+
+    # Getting first arrays
+    X = np.load("../dataset/"+labels[0]+".npy")
+    y = np.zeros(X.shape[0])
+
+    # Append all of the dataset into one single array, same goes for y
+    for i, label in enumerate(labels[1:]):
+        x = np.load("../dataset/"+label+".npy")
+        X = np.vstack((X, x))
+        y = np.append(y, np.full(x.shape[0], fill_value= (i + 1)))
+
+    assert X.shape[0] == len(y)
+
+    return train_test_split(X, y, test_size= (1 - split_ratio), random_state=random_state, shuffle=True)
+
+X_train, X_test, y_train, y_test = get_train_test()
+
+# Reshaping to perform 2D convolution
+X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], X_train.shape[2], channel)
+X_test = X_test.reshape(X_test.shape[0], X_test.shape[1], X_test.shape[2], channel)
+
+#Make sure dimension is same
+assert X_train.shape[1] == X_test.shape[1]
+assert X_train.shape[2] == X_test.shape[2]
+
+clayer = 16
+
+y_train_hot = to_categorical(y_train)
+y_test_hot = to_categorical(y_test)
+
+model = Sequential()
+model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(0.001), input_shape=(X_train.shape[1], X_train.shape[2], channel) ))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Dropout(0.5))
+
+model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(0.001) ))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Dropout(0.5))
+
+model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(0.001) ))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Dropout(0.5))
+
+model.add(Flatten())
+
+model.add(Dense(clayer, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
+model.add(Dropout(0.5))
+
+model.add(Dense(clayer, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
+model.add(Dropout(0.5))
+
+model.add(Dense(int(max(y_train))+1, activation='softmax'))
+
+model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=1e-08, decay=0.0),metrics = [f1])
+
+model.fit(X_train, y_train_hot, batch_size=128, epochs=total_ayah*512, verbose=1, validation_data=(X_test, y_test_hot))
+
+### Testing
+# Getting the MFCC
 from pprint import pprint
-import tensorflow as tf
+test_list = [
+		"../testing/"+str(surah)+"/test.wav",
+		"../testing/"+str(surah)+"/test2.wav",
+		"../testing/"+str(surah)+"/001003.mp3.wav",
+		"../testing/"+str(surah)+"/001005.mp3.wav",
+		"../testing/outlier.wav"
+		]
+test_answer = [
+		"ayat-1",
+		"ayat-1",
+		"ayat-3",
+		"ayat-5",
+]
 
-#size_l = 558
-#size_h = 416
+i = 0
 
-size_l = 256
-size_h = 256
+for t in test_list:
+	sample = wav2mfcc(t)
+	sample_reshaped = sample.reshape(1, X_train.shape[1], X_train.shape[2], channel)
+	pprint(model.predict(sample_reshaped))
+	answer = get_labels()[0][np.argmax(model.predict(sample_reshaped))]
+	print("Predicted label: "+answer)
+	if (t != "../testing/outlier.wav"): #no need to assert outlier
+		#assert answer == test_answer[i] #my voice must be recognized first, create the label later
+		i = i+1
 
-#Copying tensorflow
-def as_keras_metric(method):
-    import functools
-    from keras import backend as K
-    import tensorflow as tf
-    @functools.wraps(method)
-    def wrapper(self, args, **kwargs):
-        """ Wrapper for turning tensorflow metrics into keras metrics """
-        value, update_op = method(self, args, **kwargs)
-        K.get_session().run(tf.local_variables_initializer())
-        with tf.control_dependencies([update_op]):
-            value = tf.identity(value)
-        return value
-    return wrapper
-
-# Initialising the CNN
-classifier = Sequential()
-
-# Step 1 - Convolution
-classifier.add(Conv2D(32, (3, 3), input_shape = (size_l, size_h, 3), activation = 'relu'))
-
-# Step 2 - Pooling
-classifier.add(MaxPooling2D(pool_size = (2, 2)))
-
-# Adding a second convolutional layer
-classifier.add(Conv2D(32, (3, 3), activation = 'relu'))
-classifier.add(MaxPooling2D(pool_size = (2, 2)))
-
-# Step 3 - Flattening
-classifier.add(Flatten())
-
-# Step 4 - Full connection
-classifier.add(Dense(units = 128, activation = 'relu'))
-classifier.add(Dense(units = 7, activation = 'sigmoid'))
-
-# Compiling the CNN
-classifier.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = [as_keras_metric(tf.metrics.precision)])
-
-# Part 2 - Fitting the CNN to the images
-
-from keras.preprocessing.image import ImageDataGenerator
-
-train_datagen = ImageDataGenerator(rescale = 1./255,
-                                   shear_range = 0.2,
-                                   zoom_range = 0.2,
-                                   horizontal_flip = True)
-
-test_datagen = ImageDataGenerator(rescale = 1./255)
-
-training_set = train_datagen.flow_from_directory('../dataset/training_set',
-                                                 target_size = (size_l, size_h),
-                                                 batch_size = 4,
-                                                 class_mode = 'categorical')
-
-test_set = test_datagen.flow_from_directory('../dataset/test_set',
-                                            target_size = (size_l, size_h),
-                                            batch_size = 4,
-                                            class_mode = 'categorical')
-
-classifier.fit_generator(training_set,
-                         steps_per_epoch = 8000,
-                         epochs = 25,
-                         validation_data = test_set,
-                         validation_steps = 2000)
-
-# Part 3 - Making new predictions
-# dont make prediction first
-#import numpy as np
-#from keras.preprocessing import image
-#test_image = image.load_img('../testing/test.wav.jpg', target_size = (size_l, size_h))
-#test_image = image.img_to_array(test_image)
-#test_image = np.expand_dims(test_image, axis = 0)
-#result = classifier.predict(test_image)
-#training_set.class_indices
-#pprint(result)
+#Saving model
+model.save("../generatedmodel/surah-"+str(surah)+"-model.h5")
