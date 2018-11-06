@@ -21,7 +21,7 @@ It's json structured contains 2 schema
 * Install ffmpeg
 
 # Notes
-If you are using this on linux server, then at verse_downloader.py file you have to uncomment agg backend
+tensorboard --logdir=/tmp/logs/ --port=80 --host=0.0.0.0
 
 ### user
 * telegram_id

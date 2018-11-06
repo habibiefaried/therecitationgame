@@ -1,8 +1,9 @@
-#from preprocess import *
 import numpy as np
 import keras
 import librosa
 import ConfigParser
+
+from time import time
 
 from sklearn.model_selection import train_test_split
 from keras.utils import to_categorical
@@ -10,6 +11,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D
 from keras import backend as K
 
+from keras.callbacks import TensorBoard
 
 configParser = ConfigParser.RawConfigParser()
 configFilePath = r'../config/model.conf'
@@ -126,10 +128,9 @@ model.add(Dropout(0.5))
 
 model.add(Dense(int(max(y_train))+1, activation='softmax'))
 
-#model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=1e-08, decay=0.0),metrics = [f1])
 model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(),metrics = [f1])
-
-model.fit(X_train, y_train_hot, batch_size=128, epochs=total_ayah*512, verbose=1, validation_data=(X_test, y_test_hot))
+tensorboard = TensorBoard(log_dir="/tmp/logs/{}".format(time()))
+model.fit(X_train, y_train_hot, batch_size=128, epochs=total_ayah*512, verbose=1, validation_data=(X_test, y_test_hot),callbacks=[tensorboard])
 
 ### Testing
 # Getting the MFCC
