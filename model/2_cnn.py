@@ -105,10 +105,10 @@ model.fit(X_train, y_train_hot, batch_size=128, epochs=512, verbose=1, validatio
 # Getting the MFCC
 from pprint import pprint
 test_list = [
-		"../testing"+str(surah)+"/test.wav",
-		"../testing"+str(surah)+"/test2.wav",
-		"../testing"+str(surah)+"/001003.mp3.wav",
-		"../testing"+str(surah)+"/001005.mp3.wav",
+		"../testing/"+str(surah)+"/test.wav",
+		"../testing/"+str(surah)+"/test2.wav",
+		"../testing/"+str(surah)+"/001003.mp3.wav",
+		"../testing/"+str(surah)+"/001005.mp3.wav",
 		"../testing/outlier.wav"
 		]
 test_answer = [
