@@ -98,7 +98,7 @@ X_test = X_test.reshape(X_test.shape[0], X_test.shape[1], X_test.shape[2], chann
 assert X_train.shape[1] == X_test.shape[1]
 assert X_train.shape[2] == X_test.shape[2]
 
-clayer = 16
+clayer = 32
 
 y_train_hot = to_categorical(y_train)
 y_test_hot = to_categorical(y_test)
@@ -126,7 +126,8 @@ model.add(Dropout(0.5))
 
 model.add(Dense(int(max(y_train))+1, activation='softmax'))
 
-model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=1e-08, decay=0.0),metrics = [f1])
+#model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=1e-08, decay=0.0),metrics = [f1])
+model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(),metrics = [f1])
 
 model.fit(X_train, y_train_hot, batch_size=128, epochs=total_ayah*512, verbose=1, validation_data=(X_test, y_test_hot))
 
