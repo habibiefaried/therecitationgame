@@ -105,10 +105,10 @@ model.add(Dropout(0.5))
 
 model.add(Flatten())
 
-model.add(Dense(clayer*4, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
+model.add(Dense(clayer*4, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001) ))
 model.add(Dropout(0.5))
 
-model.add(Dense(clayer*4, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
+model.add(Dense(clayer*4, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001) ))
 model.add(Dropout(0.5))
 
 model.add(Dense(int(max(y_train))+1, activation='softmax'))
@@ -124,14 +124,12 @@ model.fit(X_train, y_train_hot, batch_size=128, epochs=total_ayah*256, verbose=1
 # Getting the MFCC
 from pprint import pprint
 test_list = [
-		"../testing/"+str(surah)+"/test.wav",
 		"../testing/"+str(surah)+"/test2.wav",
 		"../testing/"+str(surah)+"/001003.mp3.wav",
 		"../testing/"+str(surah)+"/001005.mp3.wav",
 		"../testing/outlier.wav"
 		]
 test_answer = [
-		"ayat-1",
 		"ayat-1",
 		"ayat-3",
 		"ayat-5",
@@ -146,7 +144,7 @@ for t in test_list:
 	answer = get_labels()[0][np.argmax(model.predict(sample_reshaped))]
 	print("Predicted label: "+answer)
 	if (t != "../testing/outlier.wav"): #no need to assert outlier
-		#assert answer == test_answer[i] #my voice must be recognized first, create the label later
+		assert answer == test_answer[i] #my voice must be recognized first, create the label later
 		i = i+1
 
 #Saving model
