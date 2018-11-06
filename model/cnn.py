@@ -118,7 +118,7 @@ model.compile(loss=keras.losses.categorical_crossentropy,optimizer="adam",metric
 #model.compile(loss=keras.losses.categorical_crossentropy,optimizer="rmsprop",metrics = [f1,precision])
 
 tensorboard = TensorBoard(log_dir="/tmp/logs/{}".format(time()))
-model.fit(X_train, y_train_hot, batch_size=128, epochs=total_ayah*512, verbose=1, validation_data=(X_test, y_test_hot),callbacks=[tensorboard])
+model.fit(X_train, y_train_hot, batch_size=128, epochs=total_ayah*256, verbose=1, validation_data=(X_test, y_test_hot),callbacks=[tensorboard])
 
 ### Testing
 # Getting the MFCC
