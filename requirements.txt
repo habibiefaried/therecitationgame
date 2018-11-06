@@ -13,3 +13,4 @@ librosa
 numpy
 ConfigParser
 h5py
+ffmpeg-normalize

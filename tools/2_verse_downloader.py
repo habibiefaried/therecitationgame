@@ -229,6 +229,9 @@ if (isReDownload):
 	for r in result:
         	print "Processing: ffmpeg -i "+r+" -acodec pcm_u8 -ar 22050 "+r+".wav > /dev/null 2>&1"
         	os.system("ffmpeg -i "+r+" -acodec pcm_u8 -ar 22050 "+r+".wav > /dev/null 2>&1")
+        	print "Normalize: ffmpeg-normalize "+r+" -nt ebu -t -10 -o "+r+".wav -f"
+        	os.system("ffmpeg-normalize "+r+" -nt ebu -t -10 -o "+r+".wav -f")
+
 else:
 	print "Skipping download"
 
