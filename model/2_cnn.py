@@ -43,7 +43,7 @@ def recall(y_true, y_pred):
     true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
     possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
     recall = true_positives / (possible_positives + K.epsilon())
-	return recall
+    return recall
 
 def fbeta_score(y_true, y_pred, beta=1):
     '''Calculates the F score, the weighted harmonic mean of precision and recall.
@@ -69,7 +69,7 @@ def fbeta_score(y_true, y_pred, beta=1):
     r = recall(y_true, y_pred)
     bb = beta ** 2
     fbeta_score = (1 + bb) * (p * r) / (bb * p + r + K.epsilon())
-	return fbeta_score
+    return fbeta_score
 
 # Input: Folder Path
 # Output: Tuple (Label, Indices of the labels, one-hot encoded labels)
