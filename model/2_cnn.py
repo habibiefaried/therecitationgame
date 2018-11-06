@@ -74,31 +74,32 @@ X_test = X_test.reshape(X_test.shape[0], X_test.shape[1], X_test.shape[2], chann
 assert X_train.shape[1] == X_test.shape[1]
 assert X_train.shape[2] == X_test.shape[2]
 
+clayer = 8
+
 y_train_hot = to_categorical(y_train)
 y_test_hot = to_categorical(y_test)
 
 model = Sequential()
-model.add(Conv2D(16, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(0.001), input_shape=(X_train.shape[1], X_train.shape[2], channel) ))
+model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(0.001), input_shape=(X_train.shape[1], X_train.shape[2], channel) ))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.5))
 
-model.add(Conv2D(16, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(0.001) ))
+model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(0.001) ))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.5))
 
 model.add(Flatten())
 
-model.add(Dense(16, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
+model.add(Dense(clayer, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
 model.add(Dropout(0.5))
 
-model.add(Dense(16, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
+model.add(Dense(clayer, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
 model.add(Dropout(0.5))
 
 model.add(Dense(int(max(y_train))+1, activation='softmax'))
 
 #model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0),metrics = [precision])
-#model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(lr=0.9, rho=0.95, epsilon=1e-08, decay=0.0),metrics = [precision])
-model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.SGD(lr=1e-4,momentum=0.9)
+model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(lr=0.9, rho=0.95, epsilon=1e-08, decay=0.0),metrics = [precision])
 
 learning_rate_reduction = keras.callbacks.ReduceLROnPlateau(monitor='val_loss',patience=5,verbose=1,factor=0.5,min_lr=0.001)
 

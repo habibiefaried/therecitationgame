@@ -1,12 +1,13 @@
 import urllib
 import os
+import sys
 import zipfile
 from glob import glob
 import librosa
 import numpy as np
 import ConfigParser
 
-counter = 1
+counter = 126
 
 configParser = ConfigParser.RawConfigParser()
 configFilePath = r'../config/model.conf'
@@ -21,6 +22,11 @@ total_ayah = int(configParser.get("ml-config","total_ayah"))
 
 if (isReDownload):
 	os.system("rm -rf ../audio/*") #clearing folder audio first
+	counter = 1
+else:
+	if (counter == 0):
+		print "Counter stil empty, should be set default"
+		sys.exit(-1)
 
 os.system("rm -rf ../dataset") #clearing folder dataset first
 
@@ -223,16 +229,14 @@ def analysis(max_pad_len=512):
 if (isReDownload):
 	download_1()
 	download_2()
-	print "Converting all of the files to wav..."
-	result = [y for x in os.walk("../audio") for y in glob(os.path.join(x[0], '*.mp3'))]
-
-	for r in result:
-        	print "Processing: ffmpeg -i "+r+" -acodec pcm_u8 -ar 22050 "+r+".wav > /dev/null 2>&1"
-        	os.system("ffmpeg -i "+r+" -acodec pcm_u8 -ar 22050 "+r+".wav > /dev/null 2>&1")
-        	print "Normalize: ffmpeg-normalize "+r+" -nt ebu -t -10 -o "+r+".wav -f"
-        	os.system("ffmpeg-normalize "+r+" -nt ebu -t -10 -o "+r+".wav -f")
-
 else:
 	print "Skipping download"
+
+print "Converting all of the files to wav..."
+result = [y for x in os.walk("../audio") for y in glob(os.path.join(x[0], '*.mp3'))]
+
+for r in result:
+	print "Processing: ffmpeg -i "+r+" -acodec pcm_u8 -filter:a loudnorm -ar 22050 -y "+r+".wav > /dev/null 2>&1"
+	os.system("ffmpeg -i "+r+" -acodec pcm_u8 -filter:a loudnorm -ar 22050 -y "+r+".wav > /dev/null 2>&1")
 
 analysis()
