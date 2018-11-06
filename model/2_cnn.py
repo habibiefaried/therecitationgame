@@ -28,11 +28,48 @@ def wav2mfcc(file_path, max_pad_len=512):
 	mfcc = np.pad(mfcc, pad_width=((0, 0), (0, pad_width)), mode='constant')
 	return mfcc
 
+# Metrics
+## Ref: https://github.com/GeekLiB/keras/blob/master/keras/metrics.py
 def precision(y_true, y_pred):
 	true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
 	predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
 	precision = true_positives / (predicted_positives + K.epsilon())
 	return precision
+
+def recall(y_true, y_pred):
+    '''Calculates the recall, a metric for multi-label classification of
+    how many relevant items are selected.
+    '''
+    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+    possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+    recall = true_positives / (possible_positives + K.epsilon())
+	return recall
+
+def fbeta_score(y_true, y_pred, beta=1):
+    '''Calculates the F score, the weighted harmonic mean of precision and recall.
+    This is useful for multi-label classification, where input samples can be
+    classified as sets of labels. By only using accuracy (precision) a model
+    would achieve a perfect score by simply assigning every class to every
+    input. In order to avoid this, a metric should penalize incorrect class
+    assignments as well (recall). The F-beta score (ranged from 0.0 to 1.0)
+    computes this, as a weighted mean of the proportion of correct class
+    assignments vs. the proportion of incorrect class assignments.
+    With beta = 1, this is equivalent to a F-measure. With beta < 1, assigning
+    correct classes becomes more important, and with beta > 1 the metric is
+    instead weighted towards penalizing incorrect class assignments.
+    '''
+    if beta < 0:
+        raise ValueError('The lowest choosable beta is zero (only precision).')
+        
+    # If there are no true positives, fix the F score at 0 like sklearn.
+    if K.sum(K.round(K.clip(y_true, 0, 1))) == 0:
+        return 0
+
+    p = precision(y_true, y_pred)
+    r = recall(y_true, y_pred)
+    bb = beta ** 2
+    fbeta_score = (1 + bb) * (p * r) / (bb * p + r + K.epsilon())
+	return fbeta_score
 
 # Input: Folder Path
 # Output: Tuple (Label, Indices of the labels, one-hot encoded labels)
@@ -95,11 +132,11 @@ model.add(Dropout(0.5))
 model.add(Dense(int(max(y_train))+1, activation='softmax'))
 
 #model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0),metrics = [precision])
-model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=1e-08, decay=0.0),metrics = [precision])
+model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(lr=0.5, rho=0.95, epsilon=1e-08, decay=0.0),metrics = [fbeta_score(0.5)])
 
 learning_rate_reduction = keras.callbacks.ReduceLROnPlateau(monitor='val_loss',patience=5,verbose=1,factor=0.5,min_lr=0.001)
 
-model.fit(X_train, y_train_hot, batch_size=128, epochs=512, verbose=1, validation_data=(X_test, y_test_hot))
+model.fit(X_train, y_train_hot, batch_size=128, epochs=1024, verbose=1, validation_data=(X_test, y_test_hot))
 
 ### Testing
 # Getting the MFCC
