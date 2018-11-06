@@ -132,7 +132,7 @@ model.add(Dropout(0.5))
 model.add(Dense(int(max(y_train))+1, activation='softmax'))
 
 #model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0),metrics = [precision])
-model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(lr=0.5, rho=0.95, epsilon=1e-08, decay=0.0),metrics = [fbeta_score(0.5)])
+model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(lr=0.5, rho=0.95, epsilon=1e-08, decay=0.0),metrics = [fbeta_score(beta=0.5)])
 
 learning_rate_reduction = keras.callbacks.ReduceLROnPlateau(monitor='val_loss',patience=5,verbose=1,factor=0.5,min_lr=0.001)
 
