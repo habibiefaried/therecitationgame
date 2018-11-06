@@ -99,16 +99,16 @@ model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimiz
 
 learning_rate_reduction = keras.callbacks.ReduceLROnPlateau(monitor='val_loss',patience=5,verbose=1,factor=0.5,min_lr=0.001)
 
-model.fit(X_train, y_train_hot, batch_size=64, epochs=512, verbose=1, validation_data=(X_test, y_test_hot))
+model.fit(X_train, y_train_hot, batch_size=128, epochs=512, verbose=1, validation_data=(X_test, y_test_hot))
 
 ### Testing
 # Getting the MFCC
 from pprint import pprint
 test_list = [
-		"../testing"+int(surah)+"/test.wav",
-		"../testing"+int(surah)+"/test2.wav",
-		"../testing"+int(surah)+"/001003.mp3.wav",
-		"../testing"+int(surah)+"/001005.mp3.wav",
+		"../testing"+str(surah)+"/test.wav",
+		"../testing"+str(surah)+"/test2.wav",
+		"../testing"+str(surah)+"/001003.mp3.wav",
+		"../testing"+str(surah)+"/001005.mp3.wav",
 		"../testing/outlier.wav"
 		]
 test_answer = [
@@ -131,4 +131,4 @@ for t in test_list:
 		i = i+1
 
 #Saving model
-model.save("../generatedmodel/surah-"+int(surah)+"-model.h5")
+model.save("../generatedmodel/surah-"+str(surah)+"-model.h5")
