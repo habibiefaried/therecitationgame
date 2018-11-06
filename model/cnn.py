@@ -128,7 +128,8 @@ model.add(Dropout(0.5))
 
 model.add(Dense(int(max(y_train))+1, activation='softmax'))
 
-model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(),metrics = [f1])
+#model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(),metrics = [f1])
+model.compile(loss=keras.losses.categorical_crossentropy,optimizer="adam",metrics = [f1])
 tensorboard = TensorBoard(log_dir="/tmp/logs/{}".format(time()))
 model.fit(X_train, y_train_hot, batch_size=128, epochs=total_ayah*512, verbose=1, validation_data=(X_test, y_test_hot),callbacks=[tensorboard])
 
