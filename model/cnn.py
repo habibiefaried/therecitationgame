@@ -91,24 +91,24 @@ y_train_hot = to_categorical(y_train)
 y_test_hot = to_categorical(y_test)
 
 model = Sequential()
-model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(0.001), input_shape=(X_train.shape[1], X_train.shape[2], channel) ))
+model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(0.002), input_shape=(X_train.shape[1], X_train.shape[2], channel) ))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.5))
 
-model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(0.001) ))
+model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(0.002) ))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.5))
 
-model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(0.001) ))
+model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(0.002) ))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.5))
 
 model.add(Flatten())
 
-model.add(Dense(clayer*4, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001) ))
+model.add(Dense(clayer*4, activation='relu', kernel_regularizer=keras.regularizers.l2(0.002) ))
 model.add(Dropout(0.5))
 
-model.add(Dense(clayer*4, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001) ))
+model.add(Dense(clayer*4, activation='relu', kernel_regularizer=keras.regularizers.l2(0.002) ))
 model.add(Dropout(0.5))
 
 model.add(Dense(int(max(y_train))+1, activation='softmax'))
@@ -127,7 +127,6 @@ test_list = [
 		"../testing/"+str(surah)+"/test2.wav",
 		"../testing/"+str(surah)+"/001003.mp3.wav",
 		"../testing/"+str(surah)+"/001005.mp3.wav",
-		"../testing/outlier.wav"
 		]
 test_answer = [
 		"ayat-1",
@@ -143,9 +142,8 @@ for t in test_list:
 	pprint(model.predict(sample_reshaped))
 	answer = get_labels()[0][np.argmax(model.predict(sample_reshaped))]
 	print("Predicted label: "+answer)
-	if (t != "../testing/outlier.wav"): #no need to assert outlier
-		assert answer == test_answer[i] #my voice must be recognized first, create the label later
-		i = i+1
+	assert answer == test_answer[i] #my voice must be recognized first, create the label later
+	i = i+1
 
 #Saving model
 model.save("../generatedmodel/surah-"+str(surah)+"-model.h5")
