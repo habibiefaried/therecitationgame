@@ -20,8 +20,10 @@ It's json structured contains 2 schema
 * apt-get install python-tk 
 * Install ffmpeg
 
-# Notes
-tensorboard --logdir=/tmp/logs/ --port=80 --host=0.0.0.0
+# Useful CMDs
+* Run tensorboard: tensorboard --logdir=/tmp/logs/ --port=80 --host=0.0.0.0
+* Run mp3 convertion: ffmpeg -i file.mp3 -acodec pcm_u8 -filter:a loudnorm -ar 22050 -y file.wav
+* Run ogg convertion: ffmpeg -i file.ogg -filter:a loudnorm -ar 22050 -y file.wav
 
 ### user
 * telegram_id
