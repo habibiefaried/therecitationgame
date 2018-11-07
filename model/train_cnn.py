@@ -85,7 +85,7 @@ X_test = X_test.reshape(X_test.shape[0], X_test.shape[1], X_test.shape[2], chann
 assert X_train.shape[1] == X_test.shape[1]
 assert X_train.shape[2] == X_test.shape[2]
 
-clayer = 16
+clayer = 8
 
 y_train_hot = to_categorical(y_train)
 y_test_hot = to_categorical(y_test)
@@ -108,7 +108,7 @@ model.add(Flatten())
 model.add(Dense(clayer*2, activation='relu', kernel_regularizer=keras.regularizers.l2(0.002) ))
 model.add(Dropout(0.5))
 
-#model.add(Dense(clayer*4, activation='relu', kernel_regularizer=keras.regularizers.l2(0.002) ))
+#model.add(Dense(clayer*2, activation='relu', kernel_regularizer=keras.regularizers.l2(0.002) ))
 #model.add(Dropout(0.5))
 
 model.add(Dense(int(max(y_train))+1, activation='softmax'))
