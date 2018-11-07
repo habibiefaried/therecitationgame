@@ -105,7 +105,7 @@ model.add(Dropout(0.5))
 
 model.add(Flatten())
 
-model.add(Dense(clayer*4, activation='relu', kernel_regularizer=keras.regularizers.l2(0.002) ))
+model.add(Dense(clayer*2, activation='relu', kernel_regularizer=keras.regularizers.l2(0.002) ))
 model.add(Dropout(0.5))
 
 #model.add(Dense(clayer*4, activation='relu', kernel_regularizer=keras.regularizers.l2(0.002) ))
