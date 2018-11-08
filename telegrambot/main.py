@@ -4,10 +4,7 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import logging
 import pymongo
-import test_model
 from pprint import pprint
-
-test_model.load()
 
 #Mongo connector
 f = open("../secrets/mongouser", "r")
@@ -22,6 +19,10 @@ mongostr = "mongodb://"+mongouser+":"+mongopass+"@"+mongohost+"/?ssl=true&replic
 print "Target: "+mongostr
 myclient = pymongo.MongoClient(mongostr)
 print "Connected!"
+
+print "Loading model..."
+import test_cnn
+test_cnn.load()
 
 mydb = myclient["quran"]
 myusers = mydb["users"]

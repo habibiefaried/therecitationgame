@@ -54,8 +54,13 @@ def get_labels():
 
 model = load_model("../generatedmodel/surah-"+str(surah)+"-model.h5",custom_objects={"f1": f1, "precision": precision})
 
-for i in range(1,total_ayah+1):
-        sample = wav2mfcc("../testing/"+str(surah)+"/"+str(i)+".wav")
-        sample_reshaped = sample.reshape(1, int(configParser.get("ml-config","shape_1")), int(configParser.get("ml-config","shape_2")), channel)
-	answer = get_labels()[0][np.argmax(model.predict(sample_reshaped))]
-        print("Predicted label: "+answer+". Actual Label: ayat-"+str(i))
+def testing():
+	for i in range(1,total_ayah+1):
+		sample = wav2mfcc("../testing/"+str(surah)+"/"+str(i)+".wav")
+        	sample_reshaped = sample.reshape(1, int(configParser.get("ml-config","shape_1")), int(configParser.get("ml-config","shape_2")), channel)
+		answer = get_labels()[0][np.argmax(model.predict(sample_reshaped))]
+       		print("Predicted label: "+answer+". Actual Label: ayat-"+str(i))
+
+def load():
+	if (str(type(model)) == "<class 'keras.engine.sequential.Sequential'>"):
+		print "Model is loaded!"
