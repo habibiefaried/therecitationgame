@@ -29,6 +29,12 @@ Don't forget to set secrets
 * Run mp3 convertion: ffmpeg -i file.mp3 -acodec pcm_u8 -filter:a loudnorm -ar 22050 -y file.wav
 * Run ogg convertion: ffmpeg -i file.ogg -filter:a loudnorm -ar 22050 -y file.wav
 
+# Git related
+### Stashing only 1 file (i use this for generated model)
+* $ git add .
+* $ git reset <target file>
+* $ git stash save --keep-index
+
 # DB Design
 It's json structured contains 2 schema
 
