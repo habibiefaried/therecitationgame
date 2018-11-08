@@ -55,6 +55,7 @@ def get_labels():
 model = load_model("../generatedmodel/surah-"+str(surah)+"-model.h5",custom_objects={"f1": f1, "precision": precision})
 
 def isCorrect(location, label):
+	print "Loading "+location+" ..."
 	sample = wav2mfcc(location)
 	sample_reshaped = sample.reshape(1, int(configParser.get("ml-config","shape_1")), int(configParser.get("ml-config","shape_2")), channel)
 	answer = get_labels()[0][np.argmax(model.predict(sample_reshaped))]
@@ -74,3 +75,6 @@ def testing():
 def load():
 	if (str(type(model)) == "<class 'keras.engine.sequential.Sequential'>"):
 		print "Model is loaded!"
+
+#testing()
+#isCorrect("/audios/AwADAgADogEAAvOBIEtaDlfJIcdm8gI.ogg.wav","1")

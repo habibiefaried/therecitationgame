@@ -5,6 +5,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import logging
 import pymongo
 from pprint import pprint
+import os
 
 #Mongo connector
 f = open("../secrets/mongouser", "r")
@@ -22,7 +23,8 @@ print "Connected!"
 
 print "Loading model..."
 import test_cnn
-test_cnn.load()
+
+print "Everything ready..."
 
 mydb = myclient["quran"]
 myusers = mydb["users"]
@@ -78,13 +80,14 @@ def voice(bot, update):
     x = myusers.find_one({"telegram_id": update.message.from_user.id})
     if (x):
 	target_file = "/audios/"+update.message.voice.file_id+".ogg"
+	wav_file = target_file+".wav"
+
         print "From: "+str(update.message.from_user.id)+". Name: "+update.message.from_user.username
-        print "File ID: "+update.message.voice.file_id
         update.message.voice.get_file().download(target_file)
 
-        os.system("ffmpeg -i "+target_file+" -filter:a loudnorm -ar 22050 -y "+target_file+".wav")
+        os.system("ffmpeg -i "+target_file+" -filter:a loudnorm -ar 22050 -y "+wav_file)
 
-	if (isCorrect(target_file+".wav", x['current_ayah'])):
+	if (test_cnn.isCorrect(wav_file, str(x['current_ayah']))):
 		update.message.reply_text("Correct! please go to the next ayah")
 	else:
 		update.message.reply_text("It seems that you recited in wrong way. Please /status to make sure you recite the correct ayah or try again")
