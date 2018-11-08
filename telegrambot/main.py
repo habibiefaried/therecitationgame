@@ -1,26 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Simple Bot to reply to Telegram messages.
-
-This program is dedicated to the public domain under the CC0 license.
-
-This Bot uses the Updater class to handle the bot.
-
-First, a few handler functions are defined. Then, those functions are passed to
-the Dispatcher and registered at their respective places.
-Then, the bot is started and runs until we press Ctrl-C on the command line.
-
-Usage:
-Basic Echobot example, repeats messages.
-Press Ctrl-C on the command line or send a signal to the process to stop the
-bot.
-"""
-
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import logging
 import pymongo
+import test_model
 from pprint import pprint
+
+test_model.load()
 
 #Mongo connector
 f = open("../secrets/mongouser", "r")
@@ -45,10 +32,8 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
-
 def is_user_exist(telegram_id):
     if (myusers.find_one({"telegram_id": telegram_id})):
         return True
@@ -127,7 +112,6 @@ def main():
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
-
 
 if __name__ == '__main__':
     main()
