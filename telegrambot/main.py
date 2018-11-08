@@ -6,6 +6,7 @@ import logging
 import pymongo
 from pprint import pprint
 import os
+from cnnlib import cnnlib
 
 #Mongo connector
 f = open("../secrets/mongouser", "r")
@@ -19,12 +20,7 @@ print "Connecting to mongo"
 mongostr = "mongodb://"+mongouser+":"+mongopass+"@"+mongohost+"/?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true"
 print "Target: "+mongostr
 myclient = pymongo.MongoClient(mongostr)
-print "Connected!"
-
-print "Loading model..."
-import test_cnn
-
-print "Everything ready..."
+print "Succeed! Accepting request..."
 
 mydb = myclient["quran"]
 myusers = mydb["users"]
@@ -77,6 +73,7 @@ def error(bot, update, error):
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 def voice(bot, update):
+    global C
     x = myusers.find_one({"telegram_id": update.message.from_user.id})
     if (x):
 	target_file = "/audios/"+update.message.voice.file_id+".ogg"
@@ -85,10 +82,12 @@ def voice(bot, update):
         print "From: "+str(update.message.from_user.id)+". Name: "+update.message.from_user.username
         update.message.voice.get_file().download(target_file)
 
-        os.system("ffmpeg -i "+target_file+" -filter:a loudnorm -ar 22050 -y "+wav_file)
+        os.system("ffmpeg -i "+target_file+" -filter:a loudnorm -ar 22050 -y "+wav_file+" > /dev/null 2>&1")
+	C = cnnlib()
 
-	if (test_cnn.isCorrect(wav_file, str(x['current_ayah']))):
+	if (C.isCorrect(wav_file, str(x['current_ayah']))):
 		update.message.reply_text("Correct! please go to the next ayah")
+		myusers.update_one({"telegram_id": update.message.from_user.id}, {"$set": { "current_ayah": x['current_ayah']+1 }})
 	else:
 		update.message.reply_text("It seems that you recited in wrong way. Please /status to make sure you recite the correct ayah or try again")
 
