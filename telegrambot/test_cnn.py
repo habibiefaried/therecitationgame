@@ -54,6 +54,16 @@ def get_labels():
 
 model = load_model("../generatedmodel/surah-"+str(surah)+"-model.h5",custom_objects={"f1": f1, "precision": precision})
 
+def isCorrect(location, label):
+	sample = wav2mfcc(location)
+	sample_reshaped = sample.reshape(1, int(configParser.get("ml-config","shape_1")), int(configParser.get("ml-config","shape_2")), channel)
+	answer = get_labels()[0][np.argmax(model.predict(sample_reshaped))]
+	print("[DEBUG] Predicted label: "+answer+". Actual Label: ayat-"+label)
+	if (answer == "ayat-"+label):
+		return True
+	else:
+		return False
+
 def testing():
 	for i in range(1,total_ayah+1):
 		sample = wav2mfcc("../testing/"+str(surah)+"/"+str(i)+".wav")

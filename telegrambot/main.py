@@ -45,7 +45,7 @@ def start(bot, update):
     if (is_user_exist(update.message.from_user.id)):
         update.message.reply_text("You are already registered!")
     else:
-        val = {"telegram_id" : update.message.from_user.id, "username" : update.message.from_user.username, "current_verse":1, "current_ayah":1}
+        val = {"telegram_id" : update.message.from_user.id, "username" : update.message.from_user.username, "current_surah":1, "current_ayah":1}
         myusers.insert_one(val)
         update.message.reply_text("Welcome to Al-Quran recitation bot!")
         update.message.reply_text("This bot grades your voice whether you are correctly recite an ayah or not using Deep Learning algorithm")
@@ -64,9 +64,9 @@ def leave(bot, update):
 def status(bot, update):
     x = myusers.find_one({"telegram_id": update.message.from_user.id})
     if (x):
-        surah = x['current_verse']
+        surah = x['current_surah']
         ayah = x['current_ayah']
-        update.message.reply_text("Please recite verse "+str(surah)+" ayah "+str(ayah))
+        update.message.reply_text("Please recite surah "+str(surah)+" ayah "+str(ayah))
     else:
         update.message.reply_text("401 Unauthorized. Issue /start command to register")
 
@@ -75,11 +75,20 @@ def error(bot, update, error):
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 def voice(bot, update):
-    if (is_user_exist(update.message.from_user.id)):
+    x = myusers.find_one({"telegram_id": update.message.from_user.id})
+    if (x):
+	target_file = "/audios/"+update.message.voice.file_id+".ogg"
         print "From: "+str(update.message.from_user.id)+". Name: "+update.message.from_user.username
         print "File ID: "+update.message.voice.file_id
-        update.message.voice.get_file().download("/tmp/audio.something")
-        update.message.reply_text("Received!")
+        update.message.voice.get_file().download(target_file)
+
+        os.system("ffmpeg -i "+target_file+" -filter:a loudnorm -ar 22050 -y "+target_file+".wav")
+
+	if (isCorrect(target_file+".wav", x['current_ayah'])):
+		update.message.reply_text("Correct! please go to the next ayah")
+	else:
+		update.message.reply_text("It seems that you recited in wrong way. Please /status to make sure you recite the correct ayah or try again")
+
     else:
         update.message.reply_text("401 Unauthorized. Issue /start command to register")
 
