@@ -19,7 +19,25 @@ bot.
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import logging
+import pymongo
 from pprint import pprint
+
+#Mongo connector
+f = open("../secrets/mongouser", "r")
+mongouser = f.read().split('\n')[0]
+f = open("../secrets/mongopass", "r")
+mongopass = f.read().split('\n')[0]
+f = open("../secrets/mongohost", "r")
+mongohost = f.read().split('\n')[0]
+
+print "Connecting to mongo"
+mongostr = "mongodb://"+mongouser+":"+mongopass+"@"+mongohost+"/?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true"
+print "Target: "+mongostr
+myclient = pymongo.MongoClient(mongostr)
+print "Connected!"
+
+mydb = myclient["quran"]
+myusers = mydb["users"]
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -30,33 +48,54 @@ logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
+
+def is_user_exist(telegram_id):
+    if (myusers.find_one({"telegram_id": telegram_id})):
+        return True
+    else:
+        return False
+
 def start(bot, update):
-    """Send a message when the command /start is issued."""
-    update.message.reply_text("Welcome to Al-Quran recitation bot!")
-    update.message.reply_text("This bot grades your voice whether you are correctly recite an ayah or not using Deep Learning algorithm")
-    update.message.reply_text("By registering to our system, you agree that your telegram data (username, id) will be captured for our tracking system")
-    update.message.reply_text("And also, your recorded voice will be stored for our deep learning research purposes")
-    update.message.reply_text("If you do not agree terms above, then send /leave command to delete your data")
-    update.message.reply_text("Feel free to DM me @habibiefaried if you have any questions")
-    update.message.reply_text('In order to proceed, please issue a command /status')
+    if (is_user_exist(update.message.from_user.id)):
+        update.message.reply_text("You are already registered!")
+    else:
+        val = {"telegram_id" : update.message.from_user.id, "username" : update.message.from_user.username, "current_verse":1, "current_ayah":1}
+        myusers.insert_one(val)
+        update.message.reply_text("Welcome to Al-Quran recitation bot!")
+        update.message.reply_text("This bot grades your voice whether you are correctly recite an ayah or not using Deep Learning algorithm")
+        update.message.reply_text("By registering to our system, you agree that your telegram data (username, id) will be captured for our tracking system")
+        update.message.reply_text("And also, your recorded voice will be stored for our deep learning research purposes")
+        update.message.reply_text("If you do not agree terms above, then send /leave command to delete your data")
+        update.message.reply_text("Feel free to DM me @habibiefaried if you have any questions")
+        update.message.reply_text('In order to proceed, please issue a command /status')
 
 def leave(bot, update):
-    update.message.reply_text("Your data has been deleted from our system. Good bye!")
+    if (is_user_exist(update.message.from_user.id)):
+        update.message.reply_text("Your data has been deleted from our system. Good bye!")
+    else:
+        update.message.reply_text("401 Unauthorized. Issue /start command to register")
 
 def status(bot, update):
-    surah = 1
-    ayah = 1
-    update.message.reply_text("Please recite surah "+str(surah)+" ayah "+str(ayah))
+    x = myusers.find_one({"telegram_id": update.message.from_user.id})
+    if (x):
+        surah = x['current_verse']
+        ayah = x['current_ayah']
+        update.message.reply_text("Please recite verse "+str(surah)+" ayah "+str(ayah))
+    else:
+        update.message.reply_text("401 Unauthorized. Issue /start command to register")
 
 def error(bot, update, error):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 def voice(bot, update):
-    print "From: "+str(update.message.from_user.id)+". Name: "+update.message.from_user.username
-    print "File ID: "+update.message.voice.file_id
-    update.message.voice.get_file().download("/tmp/audio.something")
-    update.message.reply_text("Received!")
+    if (is_user_exist(update.message.from_user.id)):
+        print "From: "+str(update.message.from_user.id)+". Name: "+update.message.from_user.username
+        print "File ID: "+update.message.voice.file_id
+        update.message.voice.get_file().download("/tmp/audio.something")
+        update.message.reply_text("Received!")
+    else:
+        update.message.reply_text("401 Unauthorized. Issue /start command to register")
 
 def main():
     """Start the bot."""
