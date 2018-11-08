@@ -45,37 +45,17 @@ def f1(y_true, y_pred):
         return 2*((p*r)/(p+r+K.epsilon()))
 
 def get_labels():
-        labels = []
-        for i in range(1, total_ayah+1):
-                labels.append("ayat-"+str(i))
+	labels = []
+	for i in range(1, total_ayah+1):
+		labels.append("ayat-"+str(i))
 
-        label_indices = np.arange(0, len(labels))
-        return labels, label_indices, to_categorical(label_indices)
-
-def get_train_test(split_ratio=0.75, random_state=42):
-    # Get available labels
-    labels, indices, _ = get_labels()
-
-    # Getting first arrays
-    X = np.load("../dataset/"+labels[0]+".npy")
-    y = np.zeros(X.shape[0])
-
-    # Append all of the dataset into one single array, same goes for y
-    for i, label in enumerate(labels[1:]):
-        x = np.load("../dataset/"+label+".npy")
-        X = np.vstack((X, x))
-        y = np.append(y, np.full(x.shape[0], fill_value= (i + 1)))
-
-    assert X.shape[0] == len(y)
-
-    return train_test_split(X, y, test_size= (1 - split_ratio), random_state=random_state, shuffle=True)
-
+	label_indices = np.arange(0, len(labels))
+	return labels, label_indices, to_categorical(label_indices)
 
 model = load_model("../generatedmodel/surah-"+str(surah)+"-model.h5",custom_objects={"f1": f1, "precision": precision})
-X_train, X_test, y_train, y_test = get_train_test()
 
 for i in range(1,total_ayah+1):
         sample = wav2mfcc("../testing/"+str(surah)+"/"+str(i)+".wav")
-        sample_reshaped = sample.reshape(1, X_train.shape[1], X_train.shape[2], channel)
-        answer = get_labels()[0][np.argmax(model.predict(sample_reshaped))]
+        sample_reshaped = sample.reshape(1, int(configParser.get("ml-config","shape_1")), int(configParser.get("ml-config","shape_2")), channel)
+	answer = get_labels()[0][np.argmax(model.predict(sample_reshaped))]
         print("Predicted label: "+answer+". Actual Label: ayat-"+str(i))

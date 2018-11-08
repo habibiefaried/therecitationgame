@@ -85,6 +85,12 @@ X_test = X_test.reshape(X_test.shape[0], X_test.shape[1], X_test.shape[2], chann
 assert X_train.shape[1] == X_test.shape[1]
 assert X_train.shape[2] == X_test.shape[2]
 
+#Write to config file after assertion done
+configParser.set("ml-config","shape_1",X_train.shape[1])
+configParser.set("ml-config","shape_2",X_train.shape[2])
+with open(configFilePath, 'wb') as configfile:
+	configParser.write(configfile)
+
 clayer = 8
 
 y_train_hot = to_categorical(y_train)
