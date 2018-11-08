@@ -32,23 +32,25 @@ logger = logging.getLogger(__name__)
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update):
     """Send a message when the command /start is issued."""
-    update.message.reply_text('Hi!')
+    update.message.reply_text("Welcome to Al-Quran recitation bot!")
+    update.message.reply_text("This bot grades your voice whether you are correctly recite an ayah or not using Deep Learning algorithm")
+    update.message.reply_text("By registering to our system, you agree that your telegram data (username, id) will be captured for our tracking system")
+    update.message.reply_text("And also, your recorded voice will be stored for our deep learning research purposes")
+    update.message.reply_text("If you do not agree terms above, then send /leave command to delete your data")
+    update.message.reply_text("Feel free to DM me @habibiefaried if you have any questions")
+    update.message.reply_text('In order to proceed, please issue a command /status')
 
+def leave(bot, update):
+    update.message.reply_text("Your data has been deleted from our system. Good bye!")
 
-def help(bot, update):
-    """Send a message when the command /help is issued."""
-    update.message.reply_text('Help!')
-
-
-def echo(bot, update):
-    """Echo the user message."""
-    update.message.reply_text(update.message.text)
-
+def status(bot, update):
+    surah = 1
+    ayah = 1
+    update.message.reply_text("Please recite surah "+str(surah)+" ayah "+str(ayah))
 
 def error(bot, update, error):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, error)
-
 
 def voice(bot, update):
     print "From: "+str(update.message.from_user.id)+". Name: "+update.message.from_user.username
@@ -70,10 +72,8 @@ def main():
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("help", help))
-
-    # on noncommand i.e message - echo the message on Telegram
-    dp.add_handler(MessageHandler(Filters.text, echo))
+    dp.add_handler(CommandHandler("leave", leave))
+    dp.add_handler(CommandHandler("status", status))
 
     # Audio command
     dp.add_handler(MessageHandler(Filters.voice, voice))
