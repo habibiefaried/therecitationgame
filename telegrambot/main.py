@@ -60,9 +60,9 @@ def main():
     """Start the bot."""
     # Create the EventHandler and pass it your bot's token.
     tok = ""
-    with open('/run/secrets/telegramtoken', 'r') as myfile:
+    with open('../secrets/telegramtoken', 'r') as myfile:
         tok=myfile.read().replace('\n', '')
-    
+
     updater = Updater(tok)
 
     # Get the dispatcher to register handlers

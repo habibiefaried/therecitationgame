@@ -1,11 +1,11 @@
 import pymongo
 from pprint import pprint
 
-f = open("/var/run/secrets/mongouser", "r")
+f = open("../secrets/mongouser", "r")
 mongouser = f.read()
-f = open("/var/run/secrets/mongopass", "r")
+f = open("../secrets/mongopass", "r")
 mongopass = f.read()
-f = open("/var/run/secrets/mongohost", "r")
+f = open("../secrets/mongohost", "r")
 mongohost = f.read()
 
 client = pymongo.MongoClient("mongodb://"+mongouser+":"+mongopass+"@"+mongohost+"/test")
