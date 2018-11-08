@@ -91,7 +91,7 @@ configParser.set("ml-config","shape_2",X_train.shape[2])
 with open(configFilePath, 'wb') as configfile:
 	configParser.write(configfile)
 
-clayer = 8
+clayer = 16
 dropout_ratio = 0.2
 
 y_train_hot = to_categorical(y_train)
