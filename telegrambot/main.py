@@ -82,7 +82,7 @@ def voice(bot, update):
         print "From: "+str(update.message.from_user.id)+". Name: "+update.message.from_user.username
         update.message.voice.get_file().download(target_file)
 
-        os.system("ffmpeg -i "+target_file+" -filter:a loudnorm -ar 22050 -y "+wav_file+" > /dev/null 2>&1")
+        os.system("ffmpeg -i "+target_file+" -filter:a loudnorm -ar 22050 -af 'highpass=f=200, lowpass=f=3000' -y "+wav_file+" > /dev/null 2>&1")
 	C = cnnlib()
 
 	if (C.isCorrect(wav_file, str(x['current_ayah']))):
