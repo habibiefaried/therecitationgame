@@ -54,6 +54,7 @@ def privacy(bot, update):
     update.message.reply_text("By registering to our system, you agree that your telegram data (username, id) will be captured for our tracking system")
     update.message.reply_text("And also, your recorded voice might be stored for our deep learning research purposes")
     update.message.reply_text("If you do not agree terms above, then send /leave command to delete your data")
+    update.message.reply_text("If you are doubt about what we are saying here, please inspect our source code by yourself here: https://github.com/habibiefaried/therecitationgame")
     update.message.reply_text("Feel free to DM me @habibiefaried if you have any questions")
 
 def leave(bot, update):
