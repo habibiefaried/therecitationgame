@@ -26,6 +26,7 @@ Don't forget to set secrets
 
 # Useful CMDs
 * Run tensorboard: tensorboard --logdir=/tmp/logs/ --port=80 --host=0.0.0.0
+* or on mac: python /Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/tensorboard/main.py --logdir=/tmp/logs/ --port=8080 --host=0.0.0.0
 * Run mp3 convertion: ffmpeg -i file.mp3 -acodec pcm_u8 -filter:a loudnorm -ar 22050 -y file.wav
 * Run ogg convertion: ffmpeg -i file.ogg -filter:a loudnorm -ar 22050 -y file.wav
 
