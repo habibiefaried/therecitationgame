@@ -101,6 +101,8 @@ for cnodes in nodes_list:
 	for cl in range(0,layers):
 		for al in range(0,layers):
 			for o in opts_list:
+				config_str = str(cnodes)+"-cnn_layers-"+str(cl)+"-ann_layers-"+str(al)+"-optimizer-"+str(type(o))
+
 				model = Sequential()
 				model.add(Conv2D(cnodes, kernel_size=(2, 2), activation='relu', input_shape=(X_train.shape[1], X_train.shape[2], channel), kernel_regularizer=keras.regularizers.l2(reg_score) ))
 				model.add(MaxPooling2D(pool_size=(2, 2)))
@@ -121,14 +123,14 @@ for cnodes in nodes_list:
 
 				model.compile(loss=keras.losses.categorical_crossentropy,optimizer=o,metrics = [f1,precision])
 
-				tensorboard = TensorBoard(log_dir="/tmp/logs/{}".format(time()))
+				tensorboard = TensorBoard(log_dir="/tmp/logs/"+config_str)
 				model.fit(X_train, y_train_hot, batch_size=1024, epochs=512, validation_data=(X_test, y_test_hot),callbacks=[tensorboard], verbose=0)
 
 				#Saving model
 				model.save("../generatedmodel/surah-"+str(surah)+"-model.h5")
 
 				print "==================================================================================================="
-				print "Config nodes "+str(cnodes)+" cnn layers "+str(cl)+" ann layers "+str(al)+" optimizer "+str(type(o))
+				print "Config: "+config_str
 				print "==================================================================================================="
 				C = cnnlib()
 				C.test()
