@@ -189,6 +189,33 @@ def download_2():
 		"http://audio.recitequran.com/vbv/arabic/salah_al-budair/",
 		"http://audio.recitequran.com/vbv/arabic/salah_bukhatir/",
 		"http://audio.recitequran.com/vbv/arabic/yasir_salamah/",
+		"http://tanzil.net/res/audio/abdulbasit/",
+		"http://tanzil.net/res/audio/abdulbasit-mjwd/",
+		"http://tanzil.net/res/audio/afasy/"
+		"http://tanzil.net/res/audio/ajamy/",
+		"http://tanzil.net/res/audio/akhdar/",
+		"http://tanzil.net/res/audio/ghamadi/",
+		"http://tanzil.net/res/audio/hudhaify/",
+		"http://tanzil.net/res/audio/husary/",
+		"http://tanzil.net/res/audio/husary-mjwd/",
+		"http://tanzil.net/res/audio/juhany/",
+		"http://tanzil.net/res/audio/matrood/",
+		"http://tanzil.net/res/audio/minshawi/",
+		"http://tanzil.net/res/audio/minshawi-mjwd/",
+		"http://tanzil.net/res/audio/muaiqly/",
+		"http://tanzil.net/res/audio/qasim/",
+		"http://tanzil.net/res/audio/hani/",
+		"http://tanzil.net/res/audio/sudais/",
+		"http://tanzil.net/res/audio/shateri/",
+		"http://tanzil.net/res/audio/shuraim/",
+		"http://tanzil.net/res/audio/tablawi/",
+		"http://tanzil.net/res/audio/basfar/",
+		"http://tanzil.net/res/audio/basfar2/",
+		"http://tanzil.net/res/audio/bukhatir/",
+		"http://tanzil.net/res/audio/ayyub/",
+		"http://tanzil.net/res/audio/jibreel/",
+		"http://tanzil.net/res/audio/parhizgar/",
+
 	]
 
 	for url in urls:
@@ -232,11 +259,11 @@ if (isReDownload):
 else:
 	print "Skipping download"
 
-print "Converting all of the files to wav..."
+print "Converting all of the mp3 files to wav..."
 result = [y for x in os.walk("../audio") for y in glob(os.path.join(x[0], '*.mp3'))]
 
 for r in result:
-	print "Processing: ffmpeg -i "+r+" -acodec pcm_u8 -filter:a loudnorm -ar 22050 -y "+r+".wav > /dev/null 2>&1"
-	os.system("ffmpeg -i "+r+" -acodec pcm_u8 -filter:a loudnorm -ar 22050 -y "+r+".wav > /dev/null 2>&1")
+	print "Processing: ffmpeg -i "+r+" -acodec pcm_u8 -filter:a loudnorm -ar 22050 -af 'highpass=f=200, lowpass=f=3000' -y "+r+".wav > /dev/null 2>&1"
+	os.system("ffmpeg -i "+r+" -acodec pcm_u8 -filter:a loudnorm -ar 22050 -af 'highpass=f=200, lowpass=f=3000' -y "+r+".wav > /dev/null 2>&1")
 
 analysis()
