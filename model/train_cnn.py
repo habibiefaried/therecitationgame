@@ -23,15 +23,6 @@ surah = int(configParser.get("ml-config","surah"))
 total_ayah = int(configParser.get("ml-config","total_ayah"))
 channel = 1 #treat wave as 1 channel image
 
-def wav2mfcc(file_path, max_pad_len=512):
-#Generate mfcc from wav
-	wave, sr = librosa.load(file_path, mono=True, sr=None)
-	wave = wave[::3]
-	mfcc = librosa.feature.mfcc(wave)
-	pad_width = max_pad_len - mfcc.shape[1]
-	mfcc = np.pad(mfcc, pad_width=((0, 0), (0, pad_width)), mode='constant')
-	return mfcc
-
 # Metrics
 ## https://stackoverflow.com/questions/43547402/how-to-calculate-f1-macro-in-keras
 def precision(y_true, y_pred):

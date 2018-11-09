@@ -7,7 +7,7 @@ import librosa
 import numpy as np
 import ConfigParser
 
-counter = 126
+counter = 152
 
 configParser = ConfigParser.RawConfigParser()
 configFilePath = r'../config/model.conf'
@@ -231,24 +231,32 @@ def download_2():
 
 		counter = counter+1
 
-def analysis(max_pad_len=512):
+def analysis(max_pad_len=int(configParser.get("ml-config", "max_pad_len"))):
 	global counter
 	os.system("mkdir ../dataset")
+
 	for ayah in range(1,total_ayah+1):
 		mfcc_vectors = []
 
 		for reciter in range(1,counter):
 			#Analysis take
 			print "[+]  progress: "+str(reciter)+"-"+"{0:0=3d}".format(ayah)
-			wave, sr = librosa.load("../audio/"+str(reciter)+"/"+"{0:0=3d}".format(surah)+"{0:0=3d}".format(ayah)+".mp3.wav", mono=True, sr=None)
-		    	wave = wave[::3]
-		    	mfcc = librosa.feature.mfcc(wave, sr)
+			
+			#wave, sr = librosa.load("../audio/"+str(reciter)+"/"+"{0:0=3d}".format(surah)+"{0:0=3d}".format(ayah)+".mp3.wav", mono=True, sr=None)
+		    #wave = wave[::3] 
+		    #mfcc = librosa.feature.mfcc(wave, sr)
+			
+			y, sr = librosa.load("../audio/"+str(reciter)+"/"+"{0:0=3d}".format(surah)+"{0:0=3d}".format(ayah)+".mp3.wav")
+			y = librosa.effects.harmonic(y)
+			mfcc = librosa.feature.tonnetz(y=y, sr=sr) #this is tonnetz, but i'm too lazy to change
+
 			print "[+] Detected pad_len : "+str(mfcc.shape[1])
-		    	pad_width = max_pad_len - mfcc.shape[1]
-		    	mfcc = np.pad(mfcc, pad_width=((0, 0), (0, pad_width)), mode='constant')
+			pad_width = max_pad_len - mfcc.shape[1]
+			mfcc = np.pad(mfcc, pad_width=((0, 0), (0, pad_width)), mode='constant')
 
 			#append to mfcc_vectors
 			mfcc_vectors.append(mfcc)
+
 
 		np.save("../dataset/ayat-"+str(ayah)+".npy", mfcc_vectors)
 

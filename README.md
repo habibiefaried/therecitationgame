@@ -52,6 +52,5 @@ It's json structured contains 2 schema
 * verse_number
 * total_ayah
 
-# References
-*
-*
+# Todo
+* Ganti max_pad_len
