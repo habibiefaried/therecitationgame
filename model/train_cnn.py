@@ -83,42 +83,52 @@ configParser.set("ml-config","shape_2",X_train.shape[2])
 with open(configFilePath, 'wb') as configfile:
 	configParser.write(configfile)
 
-clayer = 8
-
-dropout_ratio = 0.5
-reg_score = 0.001
+#set env
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+os.system("rm -rf /tmp/logs/*")
 
 y_train_hot = to_categorical(y_train)
 y_test_hot = to_categorical(y_test)
 
+dropout_ratio = 0.5
+reg_score = 0.001
+
 opts_list = [keras.optimizers.Adadelta(), keras.optimizers.RMSprop(), keras.optimizers.Adam(), keras.optimizers.SGD()]
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
-os.system("rm -rf /tmp/logs/*")
+nodes_list = [8,12,16] #nodes yg ingin dicoba
+layers = 1
 
-for o in opts_list:
-	model = Sequential()
-	model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', input_shape=(X_train.shape[1], X_train.shape[2], channel), kernel_regularizer=keras.regularizers.l2(reg_score) ))
-	model.add(MaxPooling2D(pool_size=(2, 2)))
-	model.add(Dropout(dropout_ratio))
+for cnodes in nodes_list:
+	for cl in range(0,layers):
+		for al in range(0,layers):
+			for o in opts_list:
+				model = Sequential()
+				model.add(Conv2D(cnodes, kernel_size=(2, 2), activation='relu', input_shape=(X_train.shape[1], X_train.shape[2], channel), kernel_regularizer=keras.regularizers.l2(reg_score) ))
+				model.add(MaxPooling2D(pool_size=(2, 2)))
+				model.add(Dropout(dropout_ratio))
 
-	#model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(reg_score)))
-	#model.add(MaxPooling2D(pool_size=(2, 2)))
-	#model.add(Dropout(dropout_ratio))
+				for r in range(0,cl):
+					model.add(Conv2D(cnodes, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(reg_score)))
+					model.add(MaxPooling2D(pool_size=(2, 2)))
+					model.add(Dropout(dropout_ratio))
 
-	model.add(Flatten())
+				model.add(Flatten())
 
-	model.add(Dense(clayer*2, activation='relu' , kernel_regularizer=keras.regularizers.l2(reg_score)))
-	model.add(Dropout(dropout_ratio))
-	model.add(Dense(int(max(y_train))+1, activation='softmax'))
+				##ANN layers
+				for r in range(0,al):
+					model.add(Dense(cnodes*2, activation='relu' , kernel_regularizer=keras.regularizers.l2(reg_score)))
+					model.add(Dropout(dropout_ratio))
+					model.add(Dense(int(max(y_train))+1, activation='softmax'))
 
-	model.compile(loss=keras.losses.categorical_crossentropy,optimizer=o,metrics = [f1,precision])
+				model.compile(loss=keras.losses.categorical_crossentropy,optimizer=o,metrics = [f1,precision])
 
-	tensorboard = TensorBoard(log_dir="/tmp/logs/{}".format(time()))
-	model.fit(X_train, y_train_hot, batch_size=1024, epochs=512, validation_data=(X_test, y_test_hot),callbacks=[tensorboard], verbose=0)
+				tensorboard = TensorBoard(log_dir="/tmp/logs/{}".format(time()))
+				model.fit(X_train, y_train_hot, batch_size=1024, epochs=512, validation_data=(X_test, y_test_hot),callbacks=[tensorboard], verbose=0)
 
-	#Saving model
-	model.save("../generatedmodel/surah-"+str(surah)+"-model.h5")
+				#Saving model
+				model.save("../generatedmodel/surah-"+str(surah)+"-model.h5")
 
-	print "============"
-	C = cnnlib()
-	C.test()
+				print "==================================================================================================="
+				print "Config nodes "+str(cnodes)+" cnn layers "+str(cl)+" ann layers "+str(al)+" optimizer "+str(type(o))
+				print "==================================================================================================="
+				C = cnnlib()
+				C.test()
