@@ -46,15 +46,20 @@ def start(bot, update):
         val = {"telegram_id" : update.message.from_user.id, "username" : update.message.from_user.username, "current_surah":1, "current_ayah":1}
         myusers.insert_one(val)
         update.message.reply_text("Welcome to Al-Quran recitation bot!")
-        update.message.reply_text("This bot grades your voice whether you are correctly recite an ayah or not using Deep Learning algorithm")
-        update.message.reply_text("By registering to our system, you agree that your telegram data (username, id) will be captured for our tracking system")
-        update.message.reply_text("And also, your recorded voice will be stored for our deep learning research purposes")
-        update.message.reply_text("If you do not agree terms above, then send /leave command to delete your data")
-        update.message.reply_text("Feel free to DM me @habibiefaried if you have any questions")
-        update.message.reply_text('In order to proceed, please issue a command /status')
+        update.message.reply_text("You need to complete the story by reciting quran per ayah based on your own progress")
+        update.message.reply_text("Your progress will be updated once you are correctly recited an ayah that assigned to you")
+        update.message.reply_text("In order to proceed, please issue a command /status")
+
+def privacy(bot, update):
+    update.message.reply_text("By registering to our system, you agree that your telegram data (username, id) will be captured for our tracking system")
+    update.message.reply_text("And also, your recorded voice might be stored for our deep learning research purposes")
+    update.message.reply_text("If you do not agree terms above, then send /leave command to delete your data")
+    update.message.reply_text("If you are doubt about what we are saying here, please inspect our source code by yourself here: https://github.com/habibiefaried/therecitationgame")
+    update.message.reply_text("Feel free to DM me @habibiefaried if you have any questions")
 
 def leave(bot, update):
     if (is_user_exist(update.message.from_user.id)):
+        myusers.delete_one({"telegram_id": update.message.from_user.id}) 
         update.message.reply_text("Your data has been deleted from our system. Good bye!")
     else:
         update.message.reply_text("401 Unauthorized. Issue /start command to register")
@@ -82,14 +87,14 @@ def voice(bot, update):
         print "From: "+str(update.message.from_user.id)+". Name: "+update.message.from_user.username
         update.message.voice.get_file().download(target_file)
 
-        os.system("ffmpeg -i "+target_file+" -filter:a loudnorm -ar 22050 -y "+wav_file+" > /dev/null 2>&1")
-	C = cnnlib()
+        os.system("ffmpeg -i "+target_file+" -filter:a loudnorm -ar 22050 -af 'highpass=f=200, lowpass=f=3000' -y "+wav_file+" > /dev/null 2>&1")
+    	C = cnnlib()
 
-	if (C.isCorrect(wav_file, str(x['current_ayah']))):
-		update.message.reply_text("Correct! please go to the next ayah")
-		myusers.update_one({"telegram_id": update.message.from_user.id}, {"$set": { "current_ayah": x['current_ayah']+1 }})
-	else:
-		update.message.reply_text("It seems that you recited in wrong way. Please /status to make sure you recite the correct ayah or try again")
+    	if (C.isCorrect(wav_file, str(x['current_ayah']))):
+    		update.message.reply_text("Correct! please go to the next ayah")
+    		myusers.update_one({"telegram_id": update.message.from_user.id}, {"$set": { "current_ayah": x['current_ayah']+1 }})
+    	else:
+    		update.message.reply_text("You are not correctly recite quran with corresponding ayah. Please /status to make sure you recite the correct ayah and try again")
 
     else:
         update.message.reply_text("401 Unauthorized. Issue /start command to register")
@@ -110,6 +115,7 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("leave", leave))
     dp.add_handler(CommandHandler("status", status))
+    dp.add_handler(CommandHandler("privacy", privacy))
 
     # Audio command
     dp.add_handler(MessageHandler(Filters.voice, voice))
