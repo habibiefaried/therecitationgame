@@ -22,18 +22,16 @@ class cnnlib:
 
 		self.model = load_model("../generatedmodel/surah-"+str(self.surah)+"-model.h5",custom_objects={"f1": self.f1, "precision": self.precision})
 
-	def wav2mfcc(self, file_path, max_pad_len=int(self.configParser.get("ml-config", "max_pad_len"))):
-		#Generate mfcc from wav
-        	#wave, sr = librosa.load(file_path, mono=True, sr=None)
-        	#wave = wave[::3]
-        	
-			y, sr = librosa.load("../audio/"+str(reciter)+"/"+"{0:0=3d}".format(surah)+"{0:0=3d}".format(ayah)+".mp3.wav")
-			y = librosa.effects.harmonic(y)
-			mfcc = librosa.feature.tonnetz(y=y, sr=sr) #this is tonnetz, but i'm too lazy to change
+	def wav2mfcc(self, file_path):
+		max_pad_len=int(self.configParser.get("ml-config", "max_pad_len"))
 
-        	pad_width = max_pad_len - mfcc.shape[1]
-        	mfcc = np.pad(mfcc, pad_width=((0, 0), (0, pad_width)), mode='constant')
-        	return mfcc
+		y, sr = librosa.load(file_path)
+		y = librosa.effects.harmonic(y)
+		mfcc = librosa.feature.tonnetz(y=y, sr=sr) #this is tonnetz, but i'm too lazy to change
+
+		pad_width = max_pad_len - mfcc.shape[1]
+		mfcc = np.pad(mfcc, pad_width=((0, 0), (0, pad_width)), mode='constant')
+		return mfcc
 
 	# Metrics
 	## https://stackoverflow.com/questions/43547402/how-to-calculate-f1-macro-in-keras

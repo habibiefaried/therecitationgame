@@ -1,6 +1,5 @@
 import numpy as np
 import keras
-import librosa
 import ConfigParser
 import os
 
@@ -85,7 +84,8 @@ with open(configFilePath, 'wb') as configfile:
 	configParser.write(configfile)
 
 clayer = 8
-dropout_ratio = 0.25
+
+dropout_ratio = 0.5
 reg_score = 0.001
 
 y_train_hot = to_categorical(y_train)
@@ -101,9 +101,9 @@ for o in opts_list:
 	model.add(MaxPooling2D(pool_size=(2, 2)))
 	model.add(Dropout(dropout_ratio))
 
-	model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(reg_score)))
-	model.add(MaxPooling2D(pool_size=(2, 2)))
-	model.add(Dropout(dropout_ratio))
+	#model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(reg_score)))
+	#model.add(MaxPooling2D(pool_size=(2, 2)))
+	#model.add(Dropout(dropout_ratio))
 
 	model.add(Flatten())
 
