@@ -92,8 +92,9 @@ configParser.set("ml-config","shape_2",X_train.shape[2])
 with open(configFilePath, 'wb') as configfile:
 	configParser.write(configfile)
 
-clayer = 12
+clayer = 10
 dropout_ratio = 0.2
+reg_score = 0.001
 
 y_train_hot = to_categorical(y_train)
 y_test_hot = to_categorical(y_test)
@@ -103,18 +104,18 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 for o in opts_list:
 	model = Sequential()
-	model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', input_shape=(X_train.shape[1], X_train.shape[2], channel), kernel_regularizer=keras.regularizers.l2(0.001) ))
+	model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', input_shape=(X_train.shape[1], X_train.shape[2], channel), kernel_regularizer=keras.regularizers.l2(reg_score) ))
 	model.add(MaxPooling2D(pool_size=(2, 2)))
 	model.add(Dropout(dropout_ratio))
 
-	model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
+	model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(reg_score)))
 	model.add(MaxPooling2D(pool_size=(2, 2)))
 	model.add(Dropout(dropout_ratio))
 
 	model.add(Flatten())
 
 	## network 2 conv2d + 1 ann * 2 on 16 node is bad
-	model.add(Dense(clayer, activation='relu' , kernel_regularizer=keras.regularizers.l2(0.001)))
+	model.add(Dense(clayer, activation='relu' , kernel_regularizer=keras.regularizers.l2(reg_score)))
 	model.add(Dropout(dropout_ratio))
 
 	model.add(Dense(int(max(y_train))+1, activation='softmax'))
