@@ -2,6 +2,7 @@ import numpy as np
 import keras
 import librosa
 import ConfigParser
+import os
 
 from time import time
 
@@ -98,6 +99,7 @@ y_train_hot = to_categorical(y_train)
 y_test_hot = to_categorical(y_test)
 
 opts_list = [keras.optimizers.Adadelta(), keras.optimizers.RMSprop(), keras.optimizers.Adam(), keras.optimizers.SGD()]
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
 for o in opts_list:
 	model = Sequential()
@@ -120,7 +122,10 @@ for o in opts_list:
 	model.compile(loss=keras.losses.categorical_crossentropy,optimizer=o,metrics = [f1,precision])
 
 	tensorboard = TensorBoard(log_dir="/tmp/logs/{}".format(time()))
-	model.fit(X_train, y_train_hot, batch_size=128, epochs=total_ayah*192, verbose=1, validation_data=(X_test, y_test_hot),callbacks=[tensorboard])
+	model.fit(X_train, y_train_hot, batch_size=128, epochs=total_ayah*192, verbose=1, validation_data=(X_test, y_test_hot),callbacks=[tensorboard], verbose=0)
 
 	#Saving model
 	model.save("../generatedmodel/surah-"+str(surah)+"-model.h5")
+
+	C = cnnlib()
+	C.test()
