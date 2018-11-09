@@ -57,7 +57,7 @@ def get_labels():
 	label_indices = np.arange(0, len(labels))
 	return labels, label_indices, to_categorical(label_indices)
 
-def get_train_test(split_ratio=0.75, random_state=42):
+def get_train_test(split_ratio=0.6, random_state=42):
     # Get available labels
     labels, indices, _ = get_labels()
 
@@ -91,41 +91,36 @@ configParser.set("ml-config","shape_2",X_train.shape[2])
 with open(configFilePath, 'wb') as configfile:
 	configParser.write(configfile)
 
-clayer = 16
+clayer = 12
 dropout_ratio = 0.2
 
 y_train_hot = to_categorical(y_train)
 y_test_hot = to_categorical(y_test)
 
-model = Sequential()
-model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', input_shape=(X_train.shape[1], X_train.shape[2], channel), kernel_regularizer=keras.regularizers.l2(0.001) ))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Dropout(dropout_ratio))
+opts_list = [keras.optimizers.Adadelta(), keras.optimizers.RMSprop(), keras.optimizers.Adam(), keras.optimizers.SGD()]
 
-model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Dropout(dropout_ratio))
+for o in opts_list:
+	model = Sequential()
+	model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', input_shape=(X_train.shape[1], X_train.shape[2], channel), kernel_regularizer=keras.regularizers.l2(0.001) ))
+	model.add(MaxPooling2D(pool_size=(2, 2)))
+	model.add(Dropout(dropout_ratio))
 
-#model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(0.002) ))
-#model.add(MaxPooling2D(pool_size=(2, 2)))
-#model.add(Dropout(0.5))
+	model.add(Conv2D(clayer, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
+	model.add(MaxPooling2D(pool_size=(2, 2)))
+	model.add(Dropout(dropout_ratio))
 
-model.add(Flatten())
+	model.add(Flatten())
 
-model.add(Dense(clayer*2, activation='relu' , kernel_regularizer=keras.regularizers.l2(0.001)))
-model.add(Dropout(dropout_ratio))
+	## network 2 conv2d + 1 ann * 2 on 16 node is bad
+	model.add(Dense(clayer, activation='relu' , kernel_regularizer=keras.regularizers.l2(0.001)))
+	model.add(Dropout(dropout_ratio))
 
-#model.add(Dense(clayer*2, activation='relu', kernel_regularizer=keras.regularizers.l2(0.002) ))
-#model.add(Dropout(0.5))
+	model.add(Dense(int(max(y_train))+1, activation='softmax'))
 
-model.add(Dense(int(max(y_train))+1, activation='softmax'))
+	model.compile(loss=keras.losses.categorical_crossentropy,optimizer=o,metrics = [f1,precision])
 
-#model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(),metrics = [f1,precision])
-#model.compile(loss=keras.losses.categorical_crossentropy,optimizer="adam",metrics = [f1,precision])
-model.compile(loss=keras.losses.categorical_crossentropy,optimizer="rmsprop",metrics = [f1,precision])
+	tensorboard = TensorBoard(log_dir="/tmp/logs/{}".format(time()))
+	model.fit(X_train, y_train_hot, batch_size=128, epochs=total_ayah*192, verbose=1, validation_data=(X_test, y_test_hot),callbacks=[tensorboard])
 
-tensorboard = TensorBoard(log_dir="/tmp/logs/{}".format(time()))
-model.fit(X_train, y_train_hot, batch_size=128, epochs=total_ayah*256, verbose=1, validation_data=(X_test, y_test_hot),callbacks=[tensorboard])
-
-#Saving model
-model.save("../generatedmodel/surah-"+str(surah)+"-model.h5")
+	#Saving model
+	model.save("../generatedmodel/surah-"+str(surah)+"-model.h5")

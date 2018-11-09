@@ -191,7 +191,7 @@ def download_2():
 		"http://audio.recitequran.com/vbv/arabic/yasir_salamah/",
 		"http://tanzil.net/res/audio/abdulbasit/",
 		"http://tanzil.net/res/audio/abdulbasit-mjwd/",
-		"http://tanzil.net/res/audio/afasy/"
+		"http://tanzil.net/res/audio/afasy/",
 		"http://tanzil.net/res/audio/ajamy/",
 		"http://tanzil.net/res/audio/akhdar/",
 		"http://tanzil.net/res/audio/ghamadi/",
