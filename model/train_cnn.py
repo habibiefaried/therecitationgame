@@ -13,6 +13,7 @@ from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D
 from keras import backend as K
 
 from keras.callbacks import TensorBoard
+from cnnlib import cnnlib
 
 configParser = ConfigParser.RawConfigParser()
 configFilePath = r'../config/model.conf'
@@ -92,8 +93,8 @@ configParser.set("ml-config","shape_2",X_train.shape[2])
 with open(configFilePath, 'wb') as configfile:
 	configParser.write(configfile)
 
-clayer = 10
-dropout_ratio = 0.2
+clayer = 8
+dropout_ratio = 0.25
 reg_score = 0.001
 
 y_train_hot = to_categorical(y_train)
@@ -101,6 +102,7 @@ y_test_hot = to_categorical(y_test)
 
 opts_list = [keras.optimizers.Adadelta(), keras.optimizers.RMSprop(), keras.optimizers.Adam(), keras.optimizers.SGD()]
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+os.system("rm -rf /tmp/logs/*")
 
 for o in opts_list:
 	model = Sequential()
@@ -114,19 +116,18 @@ for o in opts_list:
 
 	model.add(Flatten())
 
-	## network 2 conv2d + 1 ann * 2 on 16 node is bad
-	model.add(Dense(clayer, activation='relu' , kernel_regularizer=keras.regularizers.l2(reg_score)))
+	model.add(Dense(clayer*2, activation='relu' , kernel_regularizer=keras.regularizers.l2(reg_score)))
 	model.add(Dropout(dropout_ratio))
-
 	model.add(Dense(int(max(y_train))+1, activation='softmax'))
 
 	model.compile(loss=keras.losses.categorical_crossentropy,optimizer=o,metrics = [f1,precision])
 
 	tensorboard = TensorBoard(log_dir="/tmp/logs/{}".format(time()))
-	model.fit(X_train, y_train_hot, batch_size=128, epochs=total_ayah*192, verbose=1, validation_data=(X_test, y_test_hot),callbacks=[tensorboard], verbose=0)
+	model.fit(X_train, y_train_hot, batch_size=1024, epochs=512, validation_data=(X_test, y_test_hot),callbacks=[tensorboard], verbose=0)
 
 	#Saving model
 	model.save("../generatedmodel/surah-"+str(surah)+"-model.h5")
 
+	print "============"
 	C = cnnlib()
 	C.test()

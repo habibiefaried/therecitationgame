@@ -14,3 +14,4 @@ numpy
 ConfigParser
 h5py
 ffmpeg-normalize
+tensorboard
