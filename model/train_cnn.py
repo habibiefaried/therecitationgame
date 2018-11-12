@@ -98,10 +98,10 @@ nodes_list = [8,12,16] #nodes yg ingin dicoba
 layers = 1
 
 for cnodes in nodes_list:
-	for cl in range(0,layers):
-		for al in range(0,layers):
+	for cl in range(0,layers+1):
+		for al in range(0,layers+1):
 			for o in opts_list:
-				config_str = str(cnodes)+"-cnn_layers-"+str(cl)+"-ann_layers-"+str(al)+"-optimizer-"+str(type(o))
+				config_str = "nodes-"+str(cnodes)+"-second_cnn_layers-"+str(cl)+"-ann_layers-"+str(al)+"-optimizer-"+str(type(o))
 
 				print "==================================================================================================="
 				print "Config: "+config_str
@@ -109,13 +109,12 @@ for cnodes in nodes_list:
 
 				model = Sequential()
 				model.add(Conv2D(cnodes, kernel_size=(2, 2), activation='relu', input_shape=(X_train.shape[1], X_train.shape[2], channel), kernel_regularizer=keras.regularizers.l2(reg_score) ))
-				model.add(MaxPooling2D(pool_size=(2, 2)))
-				model.add(Dropout(dropout_ratio))
-
+				
 				for r in range(0,cl):
 					model.add(Conv2D(cnodes, kernel_size=(2, 2), activation='relu', kernel_regularizer=keras.regularizers.l2(reg_score)))
-					model.add(MaxPooling2D(pool_size=(2, 2)))
-					model.add(Dropout(dropout_ratio))
+
+				model.add(MaxPooling2D(pool_size=(2, 2)))
+				model.add(Dropout(dropout_ratio))
 
 				model.add(Flatten())
 
